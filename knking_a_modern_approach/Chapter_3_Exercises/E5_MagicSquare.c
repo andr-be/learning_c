@@ -14,47 +14,68 @@
 #define ROW_SIZE    4
 #define COL_SIZE    GRID_SIZE / ROW_SIZE
 
+void print_array(int[], int);
+void print_row_sums(int[], int);
+void print_col_sums(int[], int);
+void print_dia_sums(int[], int);
+
 int calculate_row_sum(int[], int, int);
 int calculate_column_sum(int[], int, int);
 int calculate_diagonal_sum(int[], int, int);
 
+
 int main(void)
 {
-    int nums[GRID_SIZE] = {0};
+    int array[GRID_SIZE] = {0};
     printf("Enter the numbers from 1 to 16 in any order:\n");
 
     scanf("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
-        &nums[ 0], &nums[ 1], &nums[ 2], &nums[ 3], 
-        &nums[ 4], &nums[ 5], &nums[ 6], &nums[ 7], 
-        &nums[ 8], &nums[ 9], &nums[10], &nums[11], 
-        &nums[12], &nums[13], &nums[14], &nums[15]
+        &array[ 0], &array[ 1], &array[ 2], &array[ 3], 
+        &array[ 4], &array[ 5], &array[ 6], &array[ 7], 
+        &array[ 8], &array[ 9], &array[10], &array[11], 
+        &array[12], &array[13], &array[14], &array[15]
     );
 
+    print_array(array, ROW_SIZE);
+    print_row_sums(array, ROW_SIZE);
+    print_col_sums(array, ROW_SIZE);
+    print_dia_sums(array, ROW_SIZE);
+}
+
+
+void print_array(int array[GRID_SIZE], int row_size){
+    putchar('\n');
     for (int j = 0; j < GRID_SIZE; j++)
     {
-        printf("%2d\t", nums[j]);
-        if ((j + 1) % ROW_SIZE == 0)
+        printf("%2d\t", array[j]);
+        if ((j + 1) % row_size == 0)
             putchar('\n');
     }
+}
 
+void print_row_sums(int array[GRID_SIZE], int row_size){
     printf("\nRow sums:\n");
     for (int i = 0; i < ROW_SIZE; i++)
     {
-        int row_sum = calculate_row_sum(nums, ROW_SIZE, i);
+        int row_sum = calculate_row_sum(array, row_size, i);
         printf("  R%d: %3d, ", i, row_sum);
     }
+}
 
+void print_col_sums(int array[GRID_SIZE], int row_size){
     printf("\nColumn sums:\n");
     for (int i = 0; i < COL_SIZE; i++)
     {
-        int col_sum = calculate_column_sum(nums, ROW_SIZE, i);
+        int col_sum = calculate_column_sum(array, row_size, i);
         printf("  C%d: %3d, ", i, col_sum);
     }
+}
 
+void print_dia_sums(int array[GRID_SIZE], int row_size){
     printf("\nDiagonal sums:\n");
     for (int i = 0; i < 2; i++)
     {
-        int dia_sum = calculate_diagonal_sum(nums, ROW_SIZE, i);
+        int dia_sum = calculate_diagonal_sum(array, row_size, i);
         printf("  D%d: %3d, ", i, dia_sum);
     }
 }
