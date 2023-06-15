@@ -12,7 +12,6 @@
 
 #define GRID_SIZE   16
 #define ROW_SIZE    4
-#define COL_SIZE    GRID_SIZE / ROW_SIZE
 
 void print_array(int[], int);
 void print_row_sums(int[], int);
@@ -37,6 +36,7 @@ int main(void)
     );
 
     print_array(array, ROW_SIZE);
+    
     print_row_sums(array, ROW_SIZE);
     print_col_sums(array, ROW_SIZE);
     print_dia_sums(array, ROW_SIZE);
@@ -64,7 +64,7 @@ void print_row_sums(int array[GRID_SIZE], int row_size){
 
 void print_col_sums(int array[GRID_SIZE], int row_size){
     printf("\nColumn sums:\n");
-    for (int i = 0; i < COL_SIZE; i++)
+    for (int i = 0; i < row_size; i++)
     {
         int col_sum = calculate_column_sum(array, row_size, i);
         printf("  C%d: %3d, ", i, col_sum);
