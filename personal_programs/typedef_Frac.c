@@ -1,12 +1,18 @@
-// FRACTION CALCULATOR
+// FRACTION CALCULATOR V2
 // andr-be 06/2023
 /*
     This program will perform basic arithmetic operations on fractions through
     use of an interactive shell.
-    It can also simplify any fraction given to it.
 
-    CAVEATS:    - all fractions given must be in the form `int/int`
-                - not all functionality has been tested extensively
+    It can also simplify most fractions given to it.
+
+    NOTES:  - all fractions given must be in the form `int/int`
+            - not all functionality has been tested extensively
+            - if you forget the comma in between fractions it doesn't work
+
+    TODO:   - function to simplify improper fractions
+            - revamp menu to simply accept parsed operations
+                i.e. (`ENTER QUERY: 1/6 + 1/6 [..] RESULT: 1/3`)
 */
 
 #include <stdio.h>
@@ -14,7 +20,6 @@
 #include <windows.h>
 
 #define DELAY_1S     Sleep(1000)
-#define DELAY_100MS  Sleep(100)
 #define DELAY_10MS   Sleep(10)
 
 typedef struct {
@@ -31,9 +36,10 @@ typedef enum {
 
 int main_menu(void);
 void print_frac(Fraction);
-Fraction get_fraction(void);
+
 Fraction simplify_frac(Fraction);
 Fraction do_operation(Operation);
+Fraction get_fraction(void);
 Fraction* get_two_fractions(Fraction*);
 
 int main(void)
@@ -41,7 +47,7 @@ int main(void)
     bool loop = true;
     Operation operation;
     Fraction result;
-    printf("\nFRACTION CALCULATOR");
+    printf("\nFRACTION CALCULATOR\n// andr-be 2023");
     DELAY_1S;
     while (loop == true)
     {
@@ -64,6 +70,7 @@ int main(void)
             case -1:
                 loop = false;
                 printf("EXITING PROGRAM\n");
+                DELAY_1S;
                 continue;
 
             default:
@@ -77,7 +84,6 @@ int main(void)
 
 int main_menu(void){
     int choice; 
-    DELAY_100MS;
     printf("\n 1: ADD");        DELAY_10MS;
     printf("\n 2: SUBTRACT");   DELAY_10MS;
     printf("\n 3: MULTIPLY");   DELAY_10MS;
@@ -87,6 +93,10 @@ int main_menu(void){
     printf("ENTER A CHOICE:  ");
     scanf("%d", &choice);
     return choice;
+}
+
+void print_frac(Fraction input){
+    printf("\nRESULT: %d/%d\n", input.numerator, input.denominator);
 }
 
 Fraction simplify_frac(Fraction input){
@@ -170,10 +180,6 @@ Fraction get_fraction(void){
 
     Fraction result = {numerator, denominator};
     return result;
-}
-
-void print_frac(Fraction input){
-    printf("\nRESULT: %d/%d\n", input.numerator, input.denominator);
 }
 
 Fraction* get_two_fractions(Fraction* array){
