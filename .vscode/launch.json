@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_3_exercises",
-      "program": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_3_exercises/build/Debug/outDebug",
+      "cwd": "c:/Users/Ben/Desktop/C/learning_c/personal_programs",
+      "program": "c:/Users/Ben/Desktop/C/learning_c/personal_programs/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
