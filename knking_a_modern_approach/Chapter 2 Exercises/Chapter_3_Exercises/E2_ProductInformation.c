@@ -54,10 +54,11 @@ struct Date get_date(void){
 
 char* generate_summary(int item_no, float unit_price, struct Date purchase_date)
 {
-    char* summary = (char*)malloc(100 * sizeof(char));
+    int buff_size = 100;
+    char* summary = (char*)malloc(buff_size * sizeof(char));
     snprintf(
         summary, 
-        100, 
+        buff_size, 
         "\nItem\t\tUnit\t\tPurchase\n\t\tPrice\t\tDate\n%d\t\t$%6.2f\t\t%0.2d/%0.2d/%0.4d\n", 
         item_no, unit_price, 
         purchase_date.DAY, purchase_date.MONTH, purchase_date.YEAR
