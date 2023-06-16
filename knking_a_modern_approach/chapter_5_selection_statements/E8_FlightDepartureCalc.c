@@ -33,10 +33,10 @@ void get_best_flight(Flight*, Time);
 
 int main (void)
 {
-    Time input = get_user_time();
     Flight available_flights[TOTAL_FLIGHTS];
-
     update(available_flights);
+    
+    Time input = get_user_time();
     get_best_flight(available_flights, input);
 }
 
