@@ -6,7 +6,8 @@
 	],
 	"settings": {
 		"files.associations": {
-			"stdint.h": "c"
+			"stdint.h": "c",
+			"type_traits": "c"
 		}
 	}
 }
