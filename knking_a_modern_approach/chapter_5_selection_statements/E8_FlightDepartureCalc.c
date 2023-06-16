@@ -97,10 +97,11 @@ void get_best_flight(Flight available[TOTAL_FLIGHTS], Time input) {
             closest_flight = minutes_apart(input, depart);
             best_flight = i;
         }
+        free(st_arrive); free(st_depart);
     }
     printf("\nBEST FLIGHT: %d", best_flight);
     printf("\tDEPARTS: %s", to_string(available[best_flight].departure));
-    printf("\tARRIVES: %s", to_string(available[best_flight].arrival));
+    printf("\tARRIVES: %s\n", to_string(available[best_flight].arrival));
 }
 
 Time get_user_time(void){
