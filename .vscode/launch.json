@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_4_expressions",
-      "program": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_4_expressions/build/Debug/outDebug",
+      "cwd": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_5_selection_statements",
+      "program": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_5_selection_statements/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
