@@ -1,4 +1,4 @@
-# Chapter 3 - Written Exercises
+# Chapter 3: Input/Output - Written Exercises
 ```C
 // andr-be 06/2023
 ```

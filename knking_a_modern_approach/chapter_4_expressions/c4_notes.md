@@ -1,4 +1,4 @@
-## Chapter 4 Notes
+## Chapter 4: Expressions - Notes
 
 ### A Partial List of C Operators & Their Precedence
 

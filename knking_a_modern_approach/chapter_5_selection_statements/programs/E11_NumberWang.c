@@ -31,25 +31,28 @@ int main(void) {
 int get_input(void){
     int input;
     printf("Enter a two digit number: ");
-    scanf("%2d", &input);
+    scanf("%d", &input);
     return input;
 }
+
 int print_to_word(int input){
-    char* tens[BUFF_SIZE/2];
-    char* ones[BUFF_SIZE/2];
+    char* tens[BUFF_SIZE/2] = {0};
+    char* ones[BUFF_SIZE/2] = {0};
     // early return the special cases
     switch (input)
     {
-    case 10: printf("ten");       return 0;
-    case 11: printf("eleven");    return 0;
-    case 12: printf("twelve");    return 0;
-    case 13: printf("thirteen");  return 0;
-    case 14: printf("fourteen");  return 0;
-    case 15: printf("fifteen");   return 0;
-    case 16: printf("sixteen");   return 0;
-    case 17: printf("seventeen"); return 0;
-    case 18: printf("eighteen");  return 0;
-    case 19: printf("nineteen");  return 0;
+    case   0: printf("zero");       return 0;
+    case  10: printf("ten");        return 0;
+    case  11: printf("eleven");     return 0;
+    case  12: printf("twelve");     return 0;
+    case  13: printf("thirteen");   return 0;
+    case  14: printf("fourteen");   return 0;
+    case  15: printf("fifteen");    return 0;
+    case  16: printf("sixteen");    return 0;
+    case  17: printf("seventeen");  return 0;
+    case  18: printf("eighteen");   return 0;
+    case  19: printf("nineteen");   return 0;
+    case 100: printf("a hundred?"); return 0;
     default: break;
     }
     // find the 10s column, add it to a string
@@ -65,7 +68,7 @@ int print_to_word(int input){
     case 9: *tens = "ninety";  break;
     }
     // copy that string to a holding variable
-    printf("%s", *tens);
+    if (*tens) printf("%s", *tens);
     // find the 1s column, add it to a string
     switch (input % 10)
     {
