@@ -1,10 +1,9 @@
 // BROKER V2
 // andr-be 06/2023
 /*
-    A few syntactical and lexical experiments going on here
-    with control flows. I like that C allows me to put
-    stuff basically wherever I want and fuck you if that's
-    nonstandard lmao
+    A few syntactical and lexical experiments with control flows. 
+    I like that C allows me to put stuff basically wherever 
+    It's a very expressive language
 */
 
 #include <stdio.h>
@@ -21,11 +20,11 @@ int main(void)
           num_shares = 0;
 
     while(1){
-        printf("Enter number of shares & price per share e.g. 10 @ 23.4 ");
+        printf("Enter number of shares & price per share e.g. 10 @ 23.4:  ");
         scanf("%f @ %f", &num_shares, &share_price);
 
         value = num_shares * share_price;
-        printf("\n%.2f  %.2f  %.2f\n", value, num_shares, share_price);
+        printf("\nTotal Value: %.2f (%.0fx @ $%.2f)\n", value, num_shares, share_price);
         my_commission = get_my_commission(value);
         rival_commission = get_rival_commission(num_shares);
 
@@ -40,13 +39,13 @@ int main(void)
 float get_my_commission(float value)
 {
     float commission;
-    if (value < 2500.00f)        commission = 30.00f  + 0.17f * value;
-    else if (value < 6250.00f)   commission = 56.00f  + 0.66f * value;
-    else if (value < 20000.00f)  commission = 76.00f  + 0.34f * value;
-    else if (value < 50000.00f)  commission = 100.00f + 0.22f * value;
-    else if (value < 500000.00f) commission = 155.00f + 0.11f * value;
-    else                         commission = 255.00f + 0.09f * value;
-    if (commission < 39.00f)     commission = 39.00f;
+    if (value < 2500.00f)         commission = 30.00f  + 0.17f * value;
+    else if (value < 6250.00f)    commission = 56.00f  + 0.66f * value;
+    else if (value < 20000.00f)   commission = 76.00f  + 0.34f * value;
+    else if (value < 50000.00f)   commission = 100.00f + 0.22f * value;
+    else if (value < 500000.00f)  commission = 155.00f + 0.11f * value;
+    else                          commission = 255.00f + 0.09f * value;
+    if (commission < 39.00f)      commission = 39.00f;
 
     return commission;
 }
