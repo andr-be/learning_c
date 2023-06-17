@@ -251,3 +251,23 @@ void print_largest_city(int area_code) {
     }
 }
 ```
+## Special Comparison Reduction Extra
+This comparison loop only performs 4 comparisons; the minimum possible.
+Also only 2 ifs.
+```C
+int num1, num2, num3, num4;
+
+int min_group_1, max_group_1;
+int min_group_2, max_group_2;
+
+int min, max;
+
+if (num1 > num2) { max_group_1 = num1; min_group_1 = num2; }
+else             { max_group_1 = num2; min_group_1 = num1; }
+
+if (num3 > num4) { max_group_2 = num3; min_group_2 = num4; }
+else             { max_group_2 = num4; min_group_2 = num3  }
+
+min = (min_group_1 < min_group_2) ? min_group_1 : min_group_2;
+max = (max_group_1 > max_group_2) ? max_group_1 : max_group_2;
+```
