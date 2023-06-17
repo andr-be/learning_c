@@ -130,7 +130,7 @@ while  ( expr2 ) {
 }
 ```
 ***
-## `for` Statement Idioms
+### `for` Statement Idioms
 ```C
 // counting up from 0 to n-1
 for (i = 0; i < n; i++) ...
@@ -151,7 +151,7 @@ for (i = n; i > 0; i--) ...
 - "Off-by-one" error caused by a mistake in the controlling expression
 
 ***
-## Omitting Expressions in a `for` Statement
+### Omitting Expressions in a `for` Statement
 ```C
 // omitting the initialising expression
 i = 10;
@@ -174,7 +174,7 @@ for (;;)
     printf("ONE MILLION DOLLARS\n")
 ```
 ***
-## `for` Statements in C99
+### `for` Statements in C99
 In C99, the first expression in a for statement can be replaced by a declaration. This feature allows the programmer to declare a variable for use by the loop:
 ```C
 for (int i = 0; i < n; i++)
@@ -191,4 +191,87 @@ for (int i = 0, j = 0; i < n; i++)
 ```
 ***
 ## The Comma Operator
+Sometimes we need to write `for` statements with two (or more) initialisers, or one that increments several variables every loop.
 
+This is done by use of a ***comma expression*** as the first or third expression in the `for` statement.
+
+```C
+// comma expression
+expr1 , expr2
+```
+First, `expr1` is evaluated and the value is discarded.
+Second, `expr2` is evaluated; its value is the value of the entire expression.
+
+**The comma operator is left associative and has the lowest precedence of all other C operators.**
+
+```C
+i = 1, j = 2, k = i + j
+
+// is evivalent to
+
+( (i = 1), (j = 2) ), ( k = (i + j) )
+```
+***
+### Program: `square2.c`
+```C
+// SQUARE GENERATOR V2
+// andr-be 06/2023
+/*
+    prints a table of squares using a for statement
+    improved the size and readability by condensing it down
+    into half as many lines
+*/
+
+#include <stdio.h>
+
+int main(void)
+{
+    int i, n;
+
+    printf("This program prints a table of squares.\n");
+    printf("Enter number of entries in table: ");
+    scanf("%d", &n);
+
+    for (i = 1; i <= n; i++) 
+        printf("%10d%10d\n", i, i * i);
+
+    return 0;
+}
+```
+***
+### Program: `square3.c`
+```C
+// SQUARE GENERATOR V3
+// andr-be 06/2023
+/*
+    prints a table of squares using an... odd method
+*/
+
+#include <stdio.h>
+
+int main(void)
+{
+    int i, n, odd, square;
+
+    printf("This program prints a table of squares.\n");
+    printf("Enter number of entries in table: ");
+    scanf("%d", &n);
+
+    i = 1;
+    odd = 3;
+    for (square = 1; i <= n; odd += 2) {
+        printf("%10d%10d\n", i, square);
+        ++i;
+        square += odd;
+    }
+
+    return 0;
+}
+```
+This for loop would be much clearer if we rearranged its pieces so that the loop is clearly controlled by `i`.
+***
+## Exiting from a Loop
+6.4 - Page 111
+```C
+```
+***
