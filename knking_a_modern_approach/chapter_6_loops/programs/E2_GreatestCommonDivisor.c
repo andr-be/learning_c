@@ -22,7 +22,7 @@ nums get_input(void) {
     return result; 
 }
 
-int g_c_div(int n, int m) {
+int gc_div(int n, int m) {
     if (n == 0 || m == 0)
         return (n == 0) ? m : n;
     
@@ -37,7 +37,7 @@ int g_c_div(int n, int m) {
 int main(void)
 {
     nums numbers = get_input();
-    int gc_divisor = g_c_div(numbers.first, numbers.second);
+    int gc_divisor = gc_div(numbers.first, numbers.second);
     printf("Greatest common divisor: %d", gc_divisor);
     return 0;
 }
