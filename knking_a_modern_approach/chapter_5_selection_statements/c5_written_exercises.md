@@ -271,3 +271,49 @@ else             { max_group_2 = num4; min_group_2 = num3  }
 min = (min_group_1 < min_group_2) ? min_group_1 : min_group_2;
 max = (max_group_1 > max_group_2) ? max_group_1 : max_group_2;
 ```
+
+> **Veeloxfire:**
+> 
+> its kind of like part of merge sort
+> 
+> heap sort is completely different
+>
+>```C
+>N starting values       = |a|b|c|d| ... 
+>N / 2 first comparisons = (a < b), (c < d), ... 
+>N results               = |ab_min, ab_max| cd_min, cd_max | ... 
+>
+>- Now it starts to merge down -
+>N / 2 comparisons   = (ab_min < cd_min), (ab_max < cd_max), ...
+>N / 2 results       = |abcd_min, abcd_max| efgh_min, efgh_max|, ... etc
+>N / 4 comparisons
+>N / 4 results
+>N / 8 comparisons
+>N / 8 results
+>...
+>2 comparisons
+>2 results
+>Finished
+>```
+> We can prove this is fewer comparisons quite easily.
+>```C
+>The original is (2 x N - 2) comparisons (2 per element for min and >max)
+>
+>                vvv - every time we "merge" we half the remaining comparisons
+>The new one is (1/2) x N + (1/2) x N + (1/4) x N + (1/8) x N + ...
+>             = (1/2 + (1/2 + 1/4 + 1/8 + ...)) x N
+>
+>The sum (1/2 + 1/4 + 1/8 + ...) is a geometric series of 1/(2 ^ N) >which conveniently has a maximum of 1
+>
+>So without even working out how many steps it is we can say this >maxes out at (1/2 + 1) x N
+>
+>3/2 * N is less than 2 therefore its fewer comparisons
+>```
+> And this math checks out 
+> we start of with 4 numbers we can show the upper bound is actually 6 (4 * 3 / 2 = 6) for the comparisons. 
+> 
+> But if we actually do the summation we end up with 4  (2/2 + 2/2 = 4). For the other version if we do the summation we end up with 6 as the minimum (4 * 2 - 2) 
+> 
+> But in algorithmic complexity we like to talk about the limit
+>
+> its hard to express why its more efficient using algorithmic complexity since both are technically bounded by O(n) which is why algorithmic complexity is difficult and misleading
