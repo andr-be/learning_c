@@ -1,5 +1,12 @@
 // FIND THE LARGEST NUMBER PROGRAM
 // andr-be 06/2023
+/*
+    Debugged an initial problem whereby I wasn't initialising
+    the array properly because I wasn't giving it a value. 
+
+    I solved this problem by defining ARRAY_MAX and giving
+    the array that size at initialisation. 
+*/
 
 #include <stdio.h>
 
@@ -25,11 +32,8 @@ int main(void)
     int size = 0;
     for (;;)
     {
-        // take user input
         float input = get_number();
-        // break if (input <= 0)
         if (input <= 0) break;
-        // add new float to array and increase size
         array[size] = input;
         size++;
     }
