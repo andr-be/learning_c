@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_6_loops/programs",
-      "program": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_6_loops/programs/build/Debug/outDebug",
+      "cwd": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_6_loops",
+      "program": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/chapter_6_loops/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
