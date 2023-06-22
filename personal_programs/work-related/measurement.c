@@ -9,6 +9,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef enum Unit
+{
+    MM,     // millimetres
+    M,      // metres
+    IN,     // inches
+    M_S,    // meters per second
+    S,      // seconds
+    US,     // microseconds
+} Unit;
+
 typedef struct Reading
 {
     double time_of_flight_s;
@@ -16,6 +26,10 @@ typedef struct Reading
     double thickness_m;
 } Reading;
 
+typedef struct Measurement {
+    double Quantity;
+    Unit Unit;
+} Measurement;
 
 Reading new_reading(double, double);
 Reading change_velocity(Reading, double);
@@ -28,14 +42,17 @@ int main(void)
     printf("Please enter the thickness in mm and your material velocity: (e.g. 10.49 @ 5918.2): ");
     scanf("%lf @ %lf", &t_mm, &v_m_s);
     Reading new = new_reading(t_mm, v_m_s);
-    printf("%s", to_string(new));
+    char* new_str = to_string(new);
+    printf("%s", new_str);
+    free(new_str);
 
 
     printf("Enter a new velocity to find what the equivalent thickness would be for that TOF: ");
     scanf("%lf", &v_m_s);
-    Reading adjusted = change_velocity(new, v_m_s);
-    printf("%s", to_string(adjusted));
-
+    Reading adjusted = change_velocity(new, v_m_s); 
+    char* adjust_str = to_string(adjusted);
+    printf("%s", adjust_str);
+    free(adjust_str);
 
     return 0;
 }
