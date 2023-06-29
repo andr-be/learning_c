@@ -1,6 +1,7 @@
 # Chapter 5: Selection Statements
 
 ## Table 1: C LOGICAL EXPRESSIONS
+
 | Symbol       | Meaning                  |
 | -----------: | :----------------------- |
 | `<`          | less than                |
@@ -14,32 +15,37 @@
 | `\|\|`       | logical *or*             |
 
 ***
+
 ## RELATIONAL OPERATORS  
-The expression `i < j < k` is legal in C, but it doesn't have the meaning you might expect from the expression. 
+
+The expression `i < j < k` is legal in C, but it doesn't have the meaning you might expect from the expression.
 
 The `<` operator is left associative, so the actual expression is equivalent to `(i < j) < k`.
 
-This means that it first tests if `i < j`, which evaluates either to `0` or `1`. 
+This means that it first tests if `i < j`, which evaluates either to `0` or `1`.
 
 *This* value is then compared to `k`; this equation does not test if `j` is in between `i` and `k`.
 
 ***
 
 ## LOGICAL OPERATORS
+
 - `!expr` has the value `1` if `expr` has the value `0`.
 - `expr1 && expr2` has the value `1` if the values of `expr1` and `expr2` are both non-zero.
 - `expr1 || expr2` has the value `1` if either `expr1` or `expr2` (or both) has a non-zero value.
 
 In all other cases, these operators produce the value `0`.
 
-`&&` and `||` perform 'short-circuit' evaluations of their operands. That means that when they evaluate the left hand operand, if the total value can be deduced from this, the right hand operand is never evaluated. 
+`&&` and `||` perform 'short-circuit' evaluations of their operands. That means that when they evaluate the left hand operand, if the total value can be deduced from this, the right hand operand is never evaluated.
 
 Consider the following expression;
 `i > 0 && ++j > 0`
 
 Although we might expect `j` to increment as a side effect of this expression, if the left hand side evaluates to `0` (`i` is not greater than `0`) then the `&&` must necessarily evaluate to `0`, and `j` is never incremented!
 ***
+
 ## PRECEDENCE & ASSOCIATIVITY
+
 The `!` operator has the same precedence as the unary plus and minmus operators.
 
 The precedence of `&&` and `||` is lower than that of the relational and equality operators.
@@ -48,7 +54,9 @@ e.g. `i < j && k == m` means `(i < j) && (k == m)`
 
 The `!` operator is right associative; `&&` and `||` are left associative.
 ***
+
 ## THE `if` STATEMENT
+
 ```C
 if ( expression )  
    statement;
@@ -59,8 +67,11 @@ if ( expression )
    do_this_too();
 }
 ```
+
 ***
-## RANGE IDIOMS    
+
+## RANGE IDIOMS
+
 ```C
 // used to test if something is outside a range
 if (0 <= i && i >= n) ...
@@ -68,8 +79,11 @@ if (0 <= i && i >= n) ...
 // used to test if something is inside a range
 if (i < 0 || i >= n) ...
 ```
+
 ***
+
 ## THE `else` CLAUSE
+
 ```C
 // one-line if-else
 if ( expression ) statement; else statement;
@@ -92,8 +106,11 @@ else
     else 
         max = k;  
 ```
+
 ***
+
 ## CASCADED `if` STATEMENTS
+
 ```C
 if (n < 0)
   printf("n is less than 0\n");
@@ -102,8 +119,11 @@ else if (n == 0)
 else
   printf("n is greater than 0\n")
 ```
+
 ***
+
 ## PROGRAM: `broker.c`
+
 ```C
 // BROKER COMMISSION CALCULATOR
 // andr-be 06/2023
@@ -138,8 +158,11 @@ int main(void)
     return 0;
 }
 ```
+
 ***
+
 ## CONDITIONAL EXPRESSIONS
+
 ```C
 // if expr1, then expr2, else expr3
 expr1 ? expr2 : expr3
@@ -155,8 +178,11 @@ k = i > j ? i : j;
 k = (i >= 0 ? i : 0) + j;   
 // k is now 3 (== i + j)
 ```
+
 ***
+
 ## CONDITIONAL EXPRESSION IDIOMS
+
 ```C
 // instead of writing
 if (i > j)
@@ -176,8 +202,11 @@ else
 // we could instead replace it with
 printf("%d\n", i > j ? i : j);
 ```
+
 ***
+
 ## BOOLEAN VALUES IN C89
+
 ```C
 // CONFUSING & BAD
 int flag;
@@ -200,8 +229,11 @@ if (flag == TRUE)
 else if (!flag)
   do_other_thing();
 ```
+
 ***
+
 ## BOOLEAN VALUES IN C99
+
 ```C
 // C99 has a _Bool type
 _Bool flag;
@@ -215,8 +247,11 @@ bool flag;    /* same as _Bool flag; */
 flag = false;
 flag = true;
 ```
+
 ***
+
 ## THE `switch` STATEMENT
+
 ```C
 // General Form
 switch ( expression ) {
@@ -253,11 +288,15 @@ switch (grade) {
             break;
 }
 ```
+
 - `case`s must be constants, and cannot be ranges or variables.
 - They can be stacked to allow fallthrough clausing.
-- A `switch` statement is not required to have a `default` clause, if it's missing and the value of the expression doesn't match any of the `cases`, control passes to the next statement after the `switch`. 
+- A `switch` statement is not required to have a `default` clause, if it's missing and the value of the expression doesn't match any of the `cases`, control passes to the next statement after the `switch`.
+
 ***
+
 ## THE ROLE OF THE `break` STATEMENT
+
 ```C
 // A common error in C is forgetting to put break clauses in switches
 switch (grade) {
@@ -283,8 +322,11 @@ switch (grade) {
             break;
 }
 ```
+
 ***
+
 ## PROGRAM: `legal_date.c`
+
 ```C
 // LEGAL DATE PRINTER
 // andr-be 06/2023
@@ -330,4 +372,5 @@ in main(void)
   return 0;
 }
 ```
+
 ***

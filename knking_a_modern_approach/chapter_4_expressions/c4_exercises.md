@@ -1,7 +1,9 @@
 # Chapter 4: Expressions - Written Exercises
+
 `// andr-be 06/2023`
 ***
-## 1. Show the output produced by each of the following program fragments. Assume that i, j, and k are int variables.
+
+## 1. Show the output produced by each of the following program fragments. Assume that i, j, and k are int variables
 
 ```C
 /*A*/   i = 5; j = 3; 
@@ -16,6 +18,7 @@
 /*D*/   i = 1; j = 2; k = 3;
         printf("%d", (i + 5) % (j + 2) / k);
 ```
+
     A:  5 / 3, 5 % 3
         1 2
 
@@ -30,14 +33,18 @@
         2 / 3
         0
 ***
-## *2. If `i` and `j` are positive integers, will the expression `(-i)/j` always have the same value as `-(i/j)`? Justify your answer.
+
+## *2. If `i` and `j` are positive integers, will the expression `(-i)/j` always have the same value as `-(i/j)`? Justify your answer
+
     I think they will, honestly. Unary Minus happens before division!
     
     If i = 10 & j = 2; in the instance of -(i/j) you're going to get -5, and for (-i)/j you still get -5.
 
     I'm not of the opinion that division of a negative number is undefined in C!
 ***
+
 ## 3. What is the value of each of the following expressions in C89? (Give all possible values if an expression may have more than one value.)
+
 ```C
 /*A*/    8 /  5
 
@@ -47,28 +54,36 @@
 
 /*D*/   -8 / -5
 ```
+
     A:    1
     B:   -1
     C:   -1
     D:    1
 ***
+
 ## 4. Repeat Exercise 3 for C99
+
     A:   1
     B:  -1
     C:  -1
     D:   1
 ***
-## 7. The algorithm for computing the UPC check digit ends with the following steps:
+
+## 7. The algorithm for computing the UPC check digit ends with the following steps
+
 ```txt
 1) Subtract 1 from the Total
 2) Compute the remainder when the adjusted total is divided by 10
 3) Subtract the remainder from 9
 ```
+
 It's tempting to try and simplify the algorithm by using these steps instead;
+
 ```txt
 1) Compute the remainder when the total is divided by 10.
 2) Subtract the remainder from 10.
 ```
+
 Why doesn't this technique work?
 
     Let's work it through!
@@ -83,11 +98,13 @@ Why doesn't this technique work?
 
     uh because you're doing a different mathematical operation?
 ***
+
 ## 8. Would the upc.c program still work if the expression `9 - ((total - 1) % 10)` were replaced by `(10 - (total % 10)) % 10`?
 
     No, because you're doing a completely different operation lmao
 ***
-## 9. Show the output produced by each of the following program fragments. Assume that `i`, `j` and `k` are `int` variables.
+
+## 9. Show the output produced by each of the following program fragments. Assume that `i`, `j` and `k` are `int` variables
 
 ```C
         int i, j, k;
@@ -127,8 +144,10 @@ Why doesn't this technique work?
         i *= 0;        i == 0;
         // 0 0 0
 ```
+
 ***
-## 10. Show the ouput produced by each of the following program fragments. Assume that `i` and `j` are `int` variables.
+
+## 10. Show the ouput produced by each of the following program fragments. Assume that `i` and `j` are `int` variables
 
 ```C
 /*A*/   i = 6;
@@ -151,8 +170,10 @@ Why doesn't this technique work?
         printf("%d %d", i, j);
         // 6 9
 ```
+
 ***
-## *11. Show the output produced by each of the following program fragments. Assume `i`, `j`, and `k` are `int` variables.
+
+## *11. Show the output produced by each of the following program fragments. Assume `i`, `j`, and `k` are `int` variables
 
 ```C
 /*A*/   i = 1;
@@ -176,8 +197,10 @@ Why doesn't this technique work?
         printf("%d %d %d", i, j, k);
         // 3 4 5 4
 ```
+
 ***
-## 12. Show the output produced by each of the following program fragments. Assume that `i` and `j` are `int` variables.
+
+## 12. Show the output produced by each of the following program fragments. Assume that `i` and `j` are `int` variables
 
 ```C
 /*A*/   i = 5;
@@ -209,11 +232,15 @@ Why doesn't this technique work?
         printf("%d %d", i, j);
         // 6 15
 ```
+
 ***
-## 13. Only one of the expressions `++i` and `i++` is exactly the same as `(i += 1)`; which is it? Justify your answer.
+
+## 13. Only one of the expressions `++i` and `i++` is exactly the same as `(i += 1)`; which is it? Justify your answer
+
     I think it's ++i, because it evaluates to 6 at runtime for maths ordering purposes, whereas i++ evaluates to 5 and increments after that point.
 ***
-## 14. Supply parentheses to show how a C compiler would interpret each of the following expressions.
+
+## 14. Supply parentheses to show how a C compiler would interpret each of the following expressions
 
 ```C
 /*A*/   a * b - c * d + e
@@ -228,8 +255,10 @@ Why doesn't this technique work?
 /*D*/   a * - b / c - d
         // ((a * (-b)) / c) - d
 ```
+
 ***
-## 15. Give the values of `i` and `j` after each of the following expression statementes has been executed. Assume that `i` has the value `1` initially and j has the value `2`.
+
+## 15. Give the values of `i` and `j` after each of the following expression statementes has been executed. Assume that `i` has the value `1` initially and j has the value `2`
 
 ```C
         int i = 1, j = 2;

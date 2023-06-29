@@ -1,7 +1,11 @@
 # General C Programming Notes
+
 ## Modern C and What We Can Learn From It - Luca Sas [ ACCU 2021 ]
+
 *Sunday, 18th June 2023 - 08:30 -* [Link to talk](https://youtu.be/QpAhX-gsHMs)
+
 ### Type-Checked Compile Time Generics
+
 ```C
 float minf(float, float);
 float mini(int, int);
@@ -11,6 +15,7 @@ float mini(int, int);
 ```
 
 ### Defer Macro
+
 ```C
 // Initial Definition
 #define macro_var(name) concat(name, __LINE__)
@@ -43,7 +48,9 @@ scope(file_close(file))
     ...
 }
 ```
-### API Design in Modern C: Math 
+
+### API Design in Modern C: Math
+
 ```C
 // Old C Style
 struct vec2 { float x, y; };
@@ -65,7 +72,9 @@ vec2 vec2_add(vec2 a, vec2 b)
 
 vec2 v = vec2_add(a, (vec2){...})
 ```
+
 ### Hand Made Math:  API Example
+
 ```C
 typedef union hmm_vec2
 {
@@ -76,12 +85,16 @@ typedef union hmm_vec2
     float Elements[2];
 } hmm_vec2;
 ```
+
 This code actually allows you to use any of the given struct names for the contents inside; i.e.
+
 ```C
 hmm_vec2 classic =  { .X = 1.50, .Y = 2.50 };
 hmm_vec2 novel =    { .Width = 0.14414, .Height = 1.1241 };
 ```
-### API Design in Modern C: Error Handling 
+
+### API Design in Modern C: Error Handling
+
 ```C
 typedef struct file_contents_t
 {
@@ -92,6 +105,7 @@ typedef struct file_contents_t
 
 file_contents_t read_file_contents(const char*);
 ```
+
 ```C
 file_contents_t fc = read_file_contents("milo.cat");
 if (fc.valid)
@@ -99,6 +113,7 @@ if (fc.valid)
     ...
 }
 ```
+
 ```C
 file_contents_t fc = read_file_contents("milo.cat");
 image_t img = load_image_from_file_contents(fc);
@@ -109,6 +124,7 @@ if (texture.valid)
     ...
 }
 ```
+
 ```C
 image_t get_cute_cat(image_t img)
 {
@@ -128,6 +144,7 @@ if (img.valid)
 ```
 
 ### API Design in Modern C: Error Codes
+
 ```C
 typedef struct file_contents_t
 {
@@ -138,13 +155,16 @@ typedef struct file_contents_t
 ```
 
 ### Generic APIs in C: Dynamic Arrays
+
 - C lacks generic programming (eg: templates)
 - C can also force us to think outside of the box and not rely excessively on templates
+
 ```C++
 // C++ Dynamic Array
 std::vector<int> v;
 v.push_back(1);
 ```
+
 ```C
 // Modern C Dynamic Array
 #define dynarray(T) T*
@@ -161,9 +181,13 @@ typedef struct dynarray_info
 dynarray(int) arr = dynarray_init(int, 10);
 dynarray_add(&arr, 99);
 ```
+
 This, by the admission of the author, is 'a bit hacky`.
+
 ### Generic APIs in C: Map
-https://github.com/nothings/std/blob/master/stb_ds.h
+
+<https://github.com/nothings/std/blob/master/stb_ds.h>
+
 ```C
 typedef struct kv
 {
@@ -173,15 +197,21 @@ typedef struct kv
 
 #define hash_map(KV) KV*
 ```
+
 ### Libraries in C
+
 - historically messy due to no standard and loads of build systems
 - single header library arises as a convenient way to solve this problem
+
 ```C
 #define LIB_IMPLEMENTATION
 #include "lib.h"
 ```
+
 - Sane CMake is another good opion. Single headers can optionally be auto-generated.
-### Old C String Handling & C Standard Library 
+
+### Old C String Handling & C Standard Library
+
 - historical disaster
 - terrible standard API (`strstr`, `strtok`, `strpbrk`)
 - avoid `libc` - The Standard C Library
@@ -192,6 +222,7 @@ typedef struct kv
 - `NULL` terminated strings are the devil
 
 ### Replacing `libc` functionality: `printf`
+
 ```C
 typedef struct cat {...} cat;
 void print_cat(cat*);
@@ -201,8 +232,10 @@ logger_register_printer("cat", print_cat);
 cat c = ...;
 log("Cat: {cat}", c);
 ```
+
 ### String Handling in Modern C
-```C 
+
+```C
 typedef struct str
 {
     char*   data;
@@ -217,6 +250,7 @@ typedef struct str_buf
     allocator_cb allocator;
 } str_buf;
 ```
+
 ```C
 str_buf str_buf_make(isize_t size, allocator_cb allocator);
 void str_buf_append(str_buf*, str);
@@ -233,6 +267,7 @@ str str_find_last(str haystack, str needle);
 str str_remove_prefix(str src, str prefix);
 str str_remove_suffix(str src, str prefix);
 ```
+
 ```C
 str str_pop_first_split(str* src, str split_by);
 // ...
@@ -241,7 +276,9 @@ str year = str_pop_first_split(&date, cstr("/"));
 str month = str_pop_first_split(&date, cstr("/"));
 str day = str_pop_first_split(&date, cstr("/"));
 ```
+
 ### String handling in Old C
+
 ```C
 // has to be an array...
 char date[] = "1981/04/01";
@@ -252,7 +289,9 @@ year = strtok(date, "/");
 month = strtok(NULL, "/");
 year = strtok(NULL, "/");
 ```
+
 ### String handling in Modern C: overloading
+
 ```C
 str str_pop_first_split_impl(str* src, str split_by);
 
@@ -268,6 +307,7 @@ str year = str_pop_first_split(&date, "/");
 str month = str_pop_first_split(&date, "/");
 str day = str_pop_first_split(&date, "/");
 ```
+
 ```C
 #define for_str_split(iter, src, split_by)
     for (

@@ -32,8 +32,8 @@ i = 2;
 j = i * i++;
 ```
 
-### Q&A Chapter 4:
+### Q&A Chapter 4
+
     Q:  I want to apply the `%` operator to a floating-point operand, but my program won't compile. What do I do?
 
     A:  The `%` operator requires integer operands. Try the `fmod` function instead.
-

@@ -1,7 +1,10 @@
 # Chapter 5 - Written Exercises
+
 `// andr-be 06/2023`
 ***
-## 1. The following program fragments illustrate the relational and equality operators. Show the output produced by each, assuming that `i`, `j` and `k` are int `values`.
+
+## 1. The following program fragments illustrate the relational and equality operators. Show the output produced by each, assuming that `i`, `j` and `k` are int `values`
+
 ```C
 /*A*/   i = 2; j = 3; 
         k = i * j == 6;
@@ -39,8 +42,11 @@
         // FALSE
 
 ```
+
 ***
-## 2. The following program fragments illustrate the logical operators. Show the output produced by each, assuming that `i`, `j`, and `k` are `int` variables.
+
+## 2. The following program fragments illustrate the logical operators. Show the output produced by each, assuming that `i`, `j`, and `k` are `int` variables
+
 ```C
 /*A*/   i = 10; j = 5;
         printf("%d", !i < j);
@@ -74,8 +80,11 @@
         // TRUE
 
 ```
+
 ***
-## 3. The following program fragments illustrate the short-circuit behaviour of logical expressions. Show the output produced by each, assuming that `i`, `j` and `k` are `int` variables.
+
+## 3. The following program fragments illustrate the short-circuit behaviour of logical expressions. Show the output produced by each, assuming that `i`, `j` and `k` are `int` variables
+
 ```C
 /*A*/   i = 3; j = 4; k = 5;
         printf("%d ", i < j || ++j < k);
@@ -106,25 +115,33 @@
         1 && 2
         // 1 2 2 2
 ```
+
 ***
-## *4. Write a single expression whose value is either `-1`, `0` or `+1`, depending on whether `i` is less than, equal to, or greater than `j`, respectively.
+
+## *4. Write a single expression whose value is either `-1`, `0` or `+1`, depending on whether `i` is less than, equal to, or greater than `j`, respectively
+
 ```C
 if (i <  j) x = -1
 if (i == j) x =  0
 if (i >  j) x =  1
 ```
+
 ```C
 // CHATGPT
 int chat_gpt_cheat(int i, int j){
     return (i > j) - (i < j);
 }
 ```
+
 ***
+
 ## *5. Is the following `if` statement legal?
+
 ```C
 if (n >= 1 <= 10)
     printf("n is between 1 and 10\n");
 ```
+
 If so, what does it do when `n` is equal to `0`?
 
     I don't think it works like it should;
@@ -136,11 +153,14 @@ If so, what does it do when `n` is equal to `0`?
     - - -
     It should evaluate to FALSE!
 ***
+
 ## *6. Is the following `if` statement legal?
+
 ```C
 if (n == 1 - 10)
     printf("n is between 1 and 10\n");
 ```
+
 If so, what does it do when `n` is equal to `5`?
 
     I think it's legal, but it doesn't achieve the intent of the statement.
@@ -152,17 +172,22 @@ If so, what does it do when `n` is equal to `5`?
     - - -
     It should evaluate to TRUE!
 ***
+
 ## 7. What does the following statement print of `i` has the value `17`? What does it print if `i` has the value `-17`?
+
 ```C
 printf("%d\n", i >= 0 ? i : -i);
 
 // i ==  17; 17
 // i == -17; 17
 ```
+
     It essentially just reverses the input if its negative.
     "if i is greater than or equal to 0, print i, otherwise print -i."
 ***
+
 ## 8. The following `if` statement is unnecessarily complicated. Simplify it as much as possible. (Hint: The entire statement can be replaced by a single assignment)
+
 ```C
 if (age >= 13)
     if (age <= 19)
@@ -176,8 +201,11 @@ else if (age < 13)
 ```C
 teenager = (age >= 13 && age <= 19);
 ```
+
 ***
+
 ## 9. Are the following `if` statements equivalent? If not, why not?
+
 ```C
 char score_to_grade_1(int score) {
     if      (score >= 90) return 'A';
@@ -202,11 +230,14 @@ char score_to_grade_2(int score) {
     else                 return 'A';
 }
 ```
+
     I think they are equivalent, having typed them all up. All the grade boundaries are the same, all of the results will get the same grade regardless of the input score. 
     
     The only difference is the order of evaluation of cases; if you were expecting more Fs than As it might make sense to go with function 2 instead of 1?
 ***
+
 ## *10. What output does the following program fragment produce? (Assume that `i` is an `int` variable.)
+
 ```C
 i = 1;
 switch (i % 3) {
@@ -215,19 +246,21 @@ switch (i % 3) {
     case 2: printf("two");
 }
 ```
+
     Modulo refers to the remainder of the LHS operand, not the RHS.
     1 % 3 == 1
     There's also a fallthrough that happens after Case 1; no `break'` statement!
     "onetwo"
 ***
-## 11. The following tables shows telephone area codes in the state of Georgia along with the largest city in each area;
+
+## 11. The following tables shows telephone area codes in the state of Georgia along with the largest city in each area
 
 | Area Code | Major City |
 | --------- | ---------- |
 | 229       | Albany     |
 | 404       | Atlanta    |
 | 470       | Atlanta    |
-| 478       | Macon      |   
+| 478       | Macon      |
 | 678       | Atlanta    |
 | 706       | Columbus   |
 | 762       | Columbus   |
@@ -235,6 +268,7 @@ switch (i % 3) {
 | 612       | Savannah   |
 
 Write a `switch` statement whose controlling expression is the variable `area_code`. If the value of `area_code` is in the table, the `switch` statement will print the corresponding city name. Otherwise, the `switch` statement will display the message `"Area code not recognized"` Use the techniques discussed in Section 5.3 to make the `switch` statement as simple as possible.
+
 ```C
 void print_largest_city(int area_code) {
     switch (area_code) {
@@ -251,9 +285,12 @@ void print_largest_city(int area_code) {
     }
 }
 ```
+
 ## Special Comparison Reduction Extra
+
 This comparison loop only performs 4 comparisons; the minimum possible.
 Also only 2 ifs.
+
 ```C
 int num1, num2, num3, num4;
 
@@ -273,9 +310,9 @@ max = (max_group_1 > max_group_2) ? max_group_1 : max_group_2;
 ```
 
 > **Veeloxfire:**
-> 
+>
 > its kind of like part of merge sort
-> 
+>
 > heap sort is completely different
 >
 >```C
@@ -295,7 +332,9 @@ max = (max_group_1 > max_group_2) ? max_group_1 : max_group_2;
 >2 results
 >Finished
 >```
+>
 > We can prove this is fewer comparisons quite easily.
+>
 >```C
 >The original is (2 x N - 2) comparisons (2 per element for min and >max)
 >
@@ -309,11 +348,12 @@ max = (max_group_1 > max_group_2) ? max_group_1 : max_group_2;
 >
 >3/2 * N is less than 2 therefore its fewer comparisons
 >```
-> And this math checks out 
-> we start of with 4 numbers we can show the upper bound is actually 6 (4 * 3 / 2 = 6) for the comparisons. 
-> 
-> But if we actually do the summation we end up with 4  (2/2 + 2/2 = 4). For the other version if we do the summation we end up with 6 as the minimum (4 * 2 - 2) 
-> 
+>
+> And this math checks out
+> we start of with 4 numbers we can show the upper bound is actually 6 (4 * 3 / 2 = 6) for the comparisons.
+>
+> But if we actually do the summation we end up with 4  (2/2 + 2/2 = 4). For the other version if we do the summation we end up with 6 as the minimum (4 * 2 - 2)
+>
 > But in algorithmic complexity we like to talk about the limit
 >
 > its hard to express why its more efficient using algorithmic complexity since both are technically bounded by O(n) which is why algorithmic complexity is difficult and misleading

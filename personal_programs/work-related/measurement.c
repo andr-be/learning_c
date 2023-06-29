@@ -31,37 +31,34 @@ typedef struct Measurement {
     Unit Unit;
 } Measurement;
 
-Reading new_reading(double, double);
+double convert_mm_to_m(double);
+Reading tof_from_thickness_speed(double, double);
 Reading change_velocity(Reading, double);
+Reading from_time_us(double, double);
 char* to_string(Reading);
 
 
 int main(void)
 {
-    double t_mm = 0, v_m_s = 0;
-    printf("Please enter the thickness in mm and your material velocity: (e.g. 10.49 @ 5918.2): ");
-    scanf("%lf @ %lf", &t_mm, &v_m_s);
-    Reading new = new_reading(t_mm, v_m_s);
-    char* new_str = to_string(new);
-    printf("%s", new_str);
-    free(new_str);
-
-
-    printf("Enter a new velocity to find what the equivalent thickness would be for that TOF: ");
-    scanf("%lf", &v_m_s);
-    Reading adjusted = change_velocity(new, v_m_s); 
-    char* adjust_str = to_string(adjusted);
-    printf("%s", adjust_str);
-    free(adjust_str);
+    Reading r = from_time_us(3.378e-6, 5918);
+    printf("R: %s", to_string(r));
+    r = from_time_us(3.378e-6, 2415);
+    printf("R: %s", to_string(r));
 
     return 0;
 }
 
+/**
+ * @brief Converts a value in millimetres to metres.
+ * 
+ * @param mm -> the value in millimetres (1e-3 m)
+ * @return double -> the value in metres
+ */
 double convert_mm_to_m(double mm) {
     return mm / 1e3;
 }
 
-Reading new_reading(double thickness_mm, double velocity_m_s) {
+Reading tof_from_thickness_speed(double thickness_mm, double velocity_m_s) {
     // accepts thickness values in mm, produces reading in metres
     double time_of_flight_s = convert_mm_to_m(thickness_mm) / velocity_m_s;
     Reading new = {
@@ -72,13 +69,6 @@ Reading new_reading(double thickness_mm, double velocity_m_s) {
     return new;
 }
 
-char* to_string(Reading r) {
-    char *result = malloc(100 * sizeof(char));
-    double mm_thick = r.thickness_m * 1e3, us_time = r.time_of_flight_s * 1e6;
-    sprintf(result, "THICK: %.2fmm\tVELOC: %.2fm/s\tTOF: %.3fus\n", mm_thick, r.velocity_m_s, us_time);
-    return result;
-}
-
 Reading change_velocity(Reading r, double velocity_m_s) {
     double new_thickness = r.time_of_flight_s * velocity_m_s;
     Reading result = {
@@ -86,5 +76,23 @@ Reading change_velocity(Reading r, double velocity_m_s) {
         .velocity_m_s = velocity_m_s,
         .thickness_m = new_thickness
     };
+    return result;
+}
+
+Reading from_time_us(double seconds, double velocity_m_s)
+{
+    double time_of_flight = (seconds * velocity_m_s);
+    Reading new_reading = {
+        .time_of_flight_s = seconds,
+        .velocity_m_s = velocity_m_s,
+        .thickness_m = time_of_flight / 2,
+    };
+    return new_reading;
+}
+
+char* to_string(Reading r) {
+    char *result = malloc(100 * sizeof(char));
+    double mm_thick = r.thickness_m * 1e3, us_time = r.time_of_flight_s * 1e6;
+    sprintf(result, "THICK: %.2fmm\tVELOC: %.2fm/s\tTOF: %.3fus\n", mm_thick, r.velocity_m_s, us_time);
     return result;
 }
