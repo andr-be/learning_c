@@ -500,3 +500,69 @@ Which means we need not change all of the different `float` variables that store
 
 ### Type Definitions and Portability
 
+Type definitions are very important for ease of portability with the code. One of the problems with moving a program from one PC to another is that the types may have different ranges on different machines. An assignment like `i = 100000;` is fine on a machine with 32-bit integers, but will fail on a machine with 16-bit integers.
+
+***For greater portability, consider using `typedef` to define new names for integer types.***
+
+Suppose we're writing a program that needs variables capable of storing quantities in the range 0-50,000. We could use `long` variables for the purpose, but we'd rather use `int` variables since arithmetic on them may be faster than the same operations on `long`; they may also take up less space.
+
+Instead of using int to declare quantity variables, we can define our own type:
+
+```C
+typedef int Quantity;
+
+Quantity q;
+```
+
+If we transport the program to a machine with shorter integers, we'll change the definition of `Quantity`. This doesn't actually solve all of our problems, since changing the definition of `Quantity` may affect the way `Quantity` variables are used. 
+
+At the very least, calls of `printf` and `scanf` that use `Quantity` variables will need to be changed, from `%d` to `%ld`.
+
+***
+
+### Integer types in C99 with \<`stdint.h`\> 
+
+In C99, the `<stdint.h>` header uses `typedef` to define names for integer types with a particular number of bits. For example, `int32_t` is a signed integer type with exactly 32 bits. Use of these types is an effective way to make programs more portable.
+
+```C
+#include <stdint.h>
+
+// MAX WIDTH
+intmax_t        uintmax_t
+
+// Specific width integer types
+int8_t          uint8_t
+int16_t         uint16_t
+int32_t         uint32_t
+int64_t         uint64_t
+
+// Minimum size integers / i.e. at least 8/16/32/64 bits
+int_least8_t     uint_least8_t
+int_least16_t    uint_least16_t
+int_least32_t    uint_least32_t
+int_least64_t    uint_least64_t
+
+// Fast integers / as fast as any other int type with specified width
+int_fast8_t     uint_fast8_t
+int_fast16_t    uint_fast16_t
+int_fast32_t    uint_fast32_t
+int_fast64_t    uint_fast64_t
+```
+
+***
+
+## The `sizeof` Operator
+
+The `sizeof` operator allows a program to determine how much memory is required to store values of a particular type. The value of the expression:
+
+```C
+sizeof  ( type-name )
+```
+
+is an unsigned integer representing the number of bytes required to store a value belonging to *type-name*. `sizeof(char)` is always 1, but the sizes of the other types may vary. On a 32-bit machine, `sizeof(int)` is usually 4.
+
+Printing a `sizeof` value requires care, because the type of a `sizeof` expression is an implementation-defined type named `size_t`. In C89 it's best to convert the value of the expression to a known type before printing it. `size_t` is guaranteed to be an unsigned integer type, so it's safest to cast a `sizeof` to `unsigned long` and then print it with `%lu`.
+
+In C99, the `size_t` type can be larger than `unsigned long`. However, the `printf` function in C99 is capable of displaying `size_t` values directly, without needing a cast. The trick is to use the letter `z` in the conversion specification, followed by one of the integer codes (typically `u`).  
+
+***
