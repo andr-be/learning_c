@@ -543,10 +543,10 @@ int_least32_t    uint_least32_t
 int_least64_t    uint_least64_t
 
 // Fast integers / as fast as any other int type with specified width
-int_fast8_t     uint_fast8_t
-int_fast16_t    uint_fast16_t
-int_fast32_t    uint_fast32_t
-int_fast64_t    uint_fast64_t
+int_fast8_t      uint_fast8_t
+int_fast16_t     uint_fast16_t
+int_fast32_t     uint_fast32_t
+int_fast64_t     uint_fast64_t
 ```
 
 ***
