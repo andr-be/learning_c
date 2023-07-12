@@ -393,3 +393,110 @@ ch = toupper(ch);   // converts ch to upper case
 
 `toupper` checks whether its argument is a lower-case latter. If so, it returns the corresponding upper-case letter. Otherwise, `toupper` returns the value of the argument.  
 
+***
+
+## Casting
+
+Sometimes we need a greater degree of control over type conversion. For this reason, we can use ***casts***.  
+
+A cast expression has the form: `( type-name ) expression`; `type-name` is the type to which `expression` should be converted.  
+
+```C
+float f, frac_part;
+
+frac_part = f - (int) f;
+```
+
+Cast expressions enable us to document type conversions that would take place anyway; to make them more explicit in the source. They also allow us to overrule the compiler and force it to do conversions that we want;
+
+```C
+i = (int) f;        // f is converted to int
+```
+
+Consider the following example;
+
+```C
+float quotient;
+
+int divident, divisor;
+
+quotient = divident / divisor;
+```
+
+If written like this, the result of the division will be converted to `float` before being stored in quotient. However, we probably want `dividend` and `divisor` converted to `float` *before* the division so we get a more exact answer without losing the fractional portion.
+
+```C
+quotient = (float) dividend / divisor;
+```
+
+Divisor doesn't need to be cast, since casting `dividend` to `float` forces the compiler to convert `divisor` to `float` also.
+
+Casts are sometimes necessary to avoid overflow:
+
+```C
+long i;
+int j = 1000;
+
+i = j * j;      // could overflow!
+```
+
+This looks unproblematic at first glance, but the problem is that when two `int` values are multiplied, the result will have `int` type. But `j * j` is too large to represent as an `int` on some machines, causing an overflow. Fortunately, we can fix it with a cast.
+
+```C
+i = (long) j * j;
+```
+
+This statement however, would not work:
+
+```C
+i = (long) (j * j);
+```
+
+Because the result of `j * j` would still overflow, but then be converted to `long`.
+
+***
+
+## Type Definitions
+
+In a previous example, we used a preprocessor `#define` directive to set up a Boolean type. A more idiomatic way to do this through use of a `typedef`.
+
+```C
+#define BOOL int
+
+...
+
+typedef int Bool;
+```
+
+Note that the name of the new type being defined comes last in the expression. Capitalising the first letter of a type name isn't required, but it's a common convention employed by C programmers.
+
+Using typedef makes the compiler add `Bool` to the list of type names that it recognises, and can be used the same way as the built in types.
+
+```C
+Bool flag;      // same as int flag;
+```
+
+***
+
+### Advantages of Type Definitions
+
+Type definitions can make a program more easily understood. For example, suppose that the variables `cash_in` and `cash_out` will be used to store dollar amounts.
+
+```C
+typedef float Dollars;
+
+Dollars cash_in, cash_out;
+```
+
+is more informative than just using `float`. Similarly, if we later decide that `Dollars` should really be defined as `double`, all we need to do is change the type definition: 
+
+```C
+typedef double Dollars;
+```
+
+Which means we need not change all of the different `float` variables that store dollar amounts and change their declarations. 
+
+***
+
+### Type Definitions and Portability
+
