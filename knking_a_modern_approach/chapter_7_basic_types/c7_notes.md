@@ -8,11 +8,11 @@
 ```C
 The largest 16 bit signed integer has the binary representation:
 0111111111111111
-which has the value 32,767 (2^15-1)
+which has the value 32,767 (2^15 - 1)
 
 The largest 32-bit signed integer is: 
 01111111111111111111111111111111
-which has the value 2,147,483,647 (2^31-1)
+which has the value 2,147,483,647 (2^31 - 1)
 
 In their unsigned form:
 16bit -> 1111111111111111 
