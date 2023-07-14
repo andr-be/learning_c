@@ -117,7 +117,7 @@ Time get_12hr_time(void){
     char meridian;
 
     printf("Enter a 12-hour time (e.g. 10:12 PM): ");
-    scanf("%2d/%2d %c", &hrs, &mins, &meridian);
+    scanf("%2d:%2d %c", &hrs, &mins, &meridian);
     printf("MER: %c\n", meridian);
     if (meridian == 'P' || meridian == 'p') {
         hrs += 12;
