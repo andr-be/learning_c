@@ -1,9 +1,8 @@
 // FLIGHT DEPARTURE CALCULATOR
 // andr-be 06/2023
 /*
-    This ended up being a way more bananas task than I realised.
-    Probably introduced some mayhem by having FLight be a struct, 
-    but it works and it's not too bad...
+    Now the clock takes input in the form of XX:YY ZM
+
 */
 
 #include <stdio.h>
@@ -41,12 +40,20 @@ int main (void)
     get_best_flight(available_flights, input);
 }
 
+/// @brief converts two integers into a Time
+/// @param hrs a 24 hour time's HH component
+/// @param mins a 24 hour time's MM component
+/// @return minute-formatted time struct 
 Time to_time(int hrs, int mins) {
     int mins_since_0 = hrs * MINS_IN_HR + mins;
     Time new = {mins_since_0};
     return new;
 }
 
+/// @brief calculate a duration in minutes between two times
+/// @param t1 the first time point
+/// @param t2 the second time point
+/// @return time difference in minutes between t1 and t2
 int minutes_apart(Time t1, Time t2) {
     int result = 0;
     result = (t1.mins > t2.mins) 
@@ -54,6 +61,9 @@ int minutes_apart(Time t1, Time t2) {
     return result;
 }
 
+/// @brief generates a pretty formatted string for printing
+/// @param input the time to be stringified
+/// @return a string of formatted input
 char* to_string(Time input) {
     int hrs  = input.mins / MINS_IN_HR, 
         mins = input.mins % MINS_IN_HR;
@@ -63,6 +73,8 @@ char* to_string(Time input) {
     return output;
 }
 
+/// @brief hacky mutation way to get the data into the program...
+/// @param blank blank array of flights that will be loaded with the problem set
 void update(Flight blank[TOTAL_FLIGHTS]) {
     Flight f1 = {to_time( 8,  0), to_time(10, 16)},
            f2 = {to_time( 9, 43), to_time(11, 52)}, 
@@ -79,6 +91,9 @@ void update(Flight blank[TOTAL_FLIGHTS]) {
         blank[i] = list[i];
 }
 
+/// @brief check every flight on the flightlist and find the closest one to input
+/// @param available the flight list of every flight that day
+/// @param input the time the search will try to get closer to
 void get_best_flight(Flight available[TOTAL_FLIGHTS], Time input) {
     int closest_flight = MINS_IN_DAY,
         best_flight = 0;
@@ -105,6 +120,8 @@ void get_best_flight(Flight available[TOTAL_FLIGHTS], Time input) {
     printf("\tARRIVES: %s\n", to_string(available[best_flight].arrival));
 }
 
+/// @brief deprecated function that gets the user to enter a time in 24hr notation
+/// @return an input checked Time structure
 Time get_user_time(void){
     int hrs = 0, mins = 0;
     printf("Enter a 24-hour time: ");
@@ -112,6 +129,8 @@ Time get_user_time(void){
     return to_time(hrs, mins);
 }
 
+/// @brief gets the time from the user in a 12-hr + meridian notation
+/// @return an input checked Time structure
 Time get_12hr_time(void){
     int hrs = 0, mins = 0;
     char meridian;
