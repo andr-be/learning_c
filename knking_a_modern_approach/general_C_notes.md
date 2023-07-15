@@ -340,4 +340,6 @@ Because of this, I've decided to avoid doing much in the way of notes for the ne
 
 It's too much of a faff and it's drastically slowing down how fast I end up going through the book because I have to work my way up to doing something very, very boring every now and again.
 
+UPDATE: Basically, all I'm missing is C7: Basic Types P3: Character Types, and not even all of it. Just some of it.
+
 ***

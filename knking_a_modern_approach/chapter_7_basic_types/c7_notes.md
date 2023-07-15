@@ -200,6 +200,91 @@ By simply changing the type of `n` to be a long instead of an int, we ensure it 
 7.2 page 132
 
 ***
+## Character-Handling Functions
+
+One approach to converting lower case letters to upper case letters is as follows:
+
+```C
+if ('a' <= ch && ch <= 'z')
+    ch = ch - 'a' + 'A'
+```
+
+A faster, and more portable, way to convert case is to call C's `toupper` library function:
+
+```C
+#include <ctype.h>  // libc header containing toupper
+
+...
+
+ch = toupper(ch);   // converts ch to upper case
+```
+
+`toupper` checks whether its argument is a lower-case latter. If so, it returns the corresponding upper-case letter. Otherwise, `toupper` returns the value of the argument.  
+
+***
+
+### Reading and Writing Characters using `scanf` and `printf`
+
+The `%c` conversion specification allows `scanf` and `printf` to read and write single characters:
+
+```C
+char ch;
+
+scanf("%c", &ch);   // reads a single character
+printf("%c", ch);   // writes a single character
+```
+
+`scanf` doesn't skip whitespace characters before reading a character. If the next unread character is a space, then `scanf` will return a space. The following loop will read and ignore all remaining characters in the input line.
+
+```C
+do {
+    scanf("%c", &ch);
+} while (ch != '\n');
+```
+
+***
+
+### Reading and Writing Characters using `getchar` and `putchar`
+
+```C
+putchar('\n');          // putchar writes a single character
+char ch = getchar();    // getchar reads a single character
+```
+
+Like `scanf`, `getchar` doesn't skip white-space characters as it reads.
+
+Using `getchar` and `putchar` is significantly faster than using `scanf` and `printf`, as they're much simpler functions that only accept a certain type of input. Secondly, `getchar` and `putchar` are usually implemented as macros for additional speed.
+
+`getchar` has another advantage over `scanf`; because it returns the character that it reads, `getchar` is more idiomatic for the C language, especially for loops that search for a character or skip over all occurrences of a character. 
+
+```C
+// scanf loop
+do {
+    scanf("%c", &ch);
+} while (ch != '\n');
+
+// rewritten to getchar
+do {
+    ch = getchar();
+} while (ch != '\n');
+
+// condensed
+while ((ch = getchar()) != '\n')
+    ;
+
+// further condensed
+while (getchar() != '\n')   // skips rest of line
+    ;
+```
+
+### Idiom: Skipping Blank Characters with `getchar`
+
+```C
+while ((ch = getchar()) == ' ')
+ ;
+```
+
+***
 
 ## Type Conversion
 
@@ -372,30 +457,8 @@ As escape sequences can get fairly cryptic, it's common for C programmers to giv
 
 ***
 
-### Character-Handling Functions
 
-One approach to converting lower case letters to upper case letters is as follows:
-
-```C
-if ('a' <= ch && ch <= 'z')
-    ch = ch - 'a' + 'A'
-```
-
-A faster, and more portable, way to convert case is to call C's `toupper` library function:
-
-```C
-#include <ctype.h>  // libc header containing toupper
-
-...
-
-ch = toupper(ch);   // converts ch to upper case
-```
-
-`toupper` checks whether its argument is a lower-case latter. If so, it returns the corresponding upper-case letter. Otherwise, `toupper` returns the value of the argument.  
-
-***
-
-## Casting
+### Casting
 
 Sometimes we need a greater degree of control over type conversion. For this reason, we can use ***casts***.  
 
