@@ -7,7 +7,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#define THRESHOLD 0.00001 
+#define THRESHOLD 1e-6
 
 int main(void)
 {
