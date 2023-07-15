@@ -114,3 +114,105 @@ Pay attention to how useful the Macro N is in this program, we utilise it 4 time
 
 ### Array Initialisation
 
+The rules for array initialisation are a bit involved, but the simplest ways we can tackle head on. The most common form of initialiser is a list of constant expressions enclosed in braces and separated by commas;
+
+```C
+int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+```
+
+If the initialiser is shorter than the array, the remaining elements of the array are given the value `0`.
+
+```C
+int a[10] = {1, 2, 3, 4, 5, 6};
+    // initial value of a is {1, 2, 3, 4, 5, 6, 0, 0, 0, 0}
+
+int a[10] = {0};
+    // initial value of a is {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+```
+
+If an initialiser is present, the length of the array may be omitted:
+
+```C
+int a[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+```
+
+as the compiler will use the length of the initialiser to determine how long the array is. The array still has a fixed number of elements, just as if we'd specified the length explicitly.
+
+***
+
+### Designated Initialisers
+
+It's often the case that most of the variables in an array will be 0, and only a few specific ones have values. To avoid having to write out massive array initialisers full of zeros, which is error-prone and tedious, we can instead use C99's ***designated initialisers***.
+
+```C
+// the virgin manual: error-prone, looks dumb, tedious
+int a[15] = {0, 0, 29, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 48};
+
+// the chad designated: modern, slick, C99 approved
+int a[15] = {[2] = 29, [9] = 7, [14] = 48};
+```
+
+Another benefit is that the order they're written in makes no different;
+
+```C
+// exactly equivalent to
+int a[15] ={[9] = 7, [2] = 29, [14] = 48};
+```
+
+Designators must have integer constant expressions. If the array has length `n`, each designator must be between `0` and `n - 1`. However, if the length of thge array is omitted, a designator can be any nonnegative int. You can also mix-and-match with old style sequential and new-style designated techniques;
+
+```C
+int b[] = {[5] = 10, [23] = 13, [11] = 36, [15] = 29};
+// has length 24 as the largest designator is [23]
+
+int c[10] = {5, 1, 9, [4] = 3, 7, 2, [8] = 6};
+// for all elements with no explicit value, 0 is assigned
+```
+
+***
+
+### Program: Checking a Number for Repeated Digits
+
+***repdigit.c***
+
+```txt
+Enter a number: 28212
+Repeated digit
+
+...
+
+Enter a number: 123456
+No repeated digit
+```
+
+```C
+// checks numbers for repeated digits
+
+#include <stdbool.h> // C99 only!
+#include <stdio.h>
+
+int main(void)
+{
+    bool digit_seen[10] = {false};
+    int digit;
+    long n;
+
+    printf("Enter a number: ");
+    scanf("%ld", &n);
+
+    while (n > 0) {
+        digit = n % 10;
+        if (digit_seen[digit]) break;
+        digit_seen[digit] = true;
+        n /= 10;
+    }
+
+    if (n > 0)  printf("Repeated digit\n");
+    else        printf("No repeated digit\n");
+}
+```
+
+***
+
+### Using the `sizeof` Operator with Arrays
+
