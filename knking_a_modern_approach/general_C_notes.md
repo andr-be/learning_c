@@ -328,3 +328,16 @@ for_str_split(it, date, "/")
     print("{str}", it);
 }
 ```
+
+***
+
+## General Update on Note-taking
+
+`14/07/2023`
+
+Annoyingly, I keep breaking the history of the md notes I'm creating. 
+Because of this, I've decided to avoid doing much in the way of notes for the next few chapters and see if it affects my understanding. I'll still read everything in the book and note the programs, but I won't be basically retyping the notes. The exercises will all still be done in full.
+
+It's too much of a faff and it's drastically slowing down how fast I end up going through the book because I have to work my way up to doing something very, very boring every now and again.
+
+***
