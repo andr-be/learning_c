@@ -8,7 +8,7 @@
     - non-letters remain unchanged
     - lower case remains lower case, upper remains upper
         ((ch - 'A') + n) % 26 + 'A' calculates upper case letter.
-        ((ch - 'a') + n) % 26 + 'a' calculates lower case??
+        ((ch - 'a') + n) % 26 + 'a' calculates lower case
 */
 
 #include <stdio.h>
@@ -40,7 +40,6 @@ char encrypt(char input, int shift) {
 
     if (tolower(input) == input) 
         return ((input - 'a') + shift) % 26 + 'a';
-
     else                         
         return ((input - 'A') + shift) % 26 + 'A';
 }
