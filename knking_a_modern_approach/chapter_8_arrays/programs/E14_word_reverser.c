@@ -44,7 +44,8 @@ int main(void)
             if (is_terminator(buffer[i])) 
                 terminator = buffer[i];
         }
-        if (start_index != 0) printf("%c", ' ');
+        if (start_index != 0) 
+            printf("%c", ' ');
         end_index = start_index;
     }
     putchar(terminator);
