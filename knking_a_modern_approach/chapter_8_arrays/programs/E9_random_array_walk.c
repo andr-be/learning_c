@@ -78,7 +78,7 @@ int main(void)
     // print array
     for (int i = 0; i < 10; i++) {
         for (int j = 0; j < 10; j++) {
-            printf("%c ", a[i][j]);
+            printf("%c  ", a[i][j]);
         }
         putchar('\n');
     }
