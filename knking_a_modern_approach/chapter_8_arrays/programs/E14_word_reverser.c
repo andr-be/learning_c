@@ -14,11 +14,13 @@
 */
 #include <stdio.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #define BUFFSIZE 50 
 
 int get_last_char_idx(char input[BUFFSIZE]);
 int get_next_space_idx(char input[BUFFSIZE], int c_index);
+bool is_terminator(char input);
 
 int main(void)
 {
@@ -36,25 +38,36 @@ int main(void)
     // walk backwards until you reach a space
     while (end_index > 0) {
         start_index = get_next_space_idx(buffer, end_index);
-        for (int i = start_index + 1; i < end_index; i++) {
-            printf("%c", buffer[i]);
+        for (int i = start_index; i < end_index; i++) {
+            if (isalpha(buffer[i]) || buffer[i] == '\'')
+                printf("%c", buffer[i]);
+            if (is_terminator(buffer[i])) 
+                terminator = buffer[i];
         }
-        printf("%c", ' ');
-        end_index = (end_index > start_index) ? start_index : start_index - 1;
-    }        
+        if (start_index != 0) printf("%c", ' ');
+        end_index = start_index;
+    }
+    putchar(terminator);
     return 0;
 }
 
 int get_last_char_idx(char input[BUFFSIZE]) {
-    for (int i = 0; i < BUFFSIZE; i++) {
+    for (int i = 0; i < BUFFSIZE; i++)
         if (input[i] == '\n') return i;
-    }
+    
     return BUFFSIZE;
 }
 
 int get_next_space_idx(char input[BUFFSIZE], int c_index) {
-    for (int i = c_index; i > 0; i--) {
+    for (int i = c_index - 1; i > 0; i--)
         if (input[i] == ' ') return i;
-    }
+    
     return 0;
+}
+
+bool is_terminator(char input) {
+    if (input == '.' || input == '?' || input == '!') 
+        return true;
+    else 
+        return false;
 }
