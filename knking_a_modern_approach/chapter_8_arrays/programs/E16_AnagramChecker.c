@@ -33,6 +33,5 @@ int main(void)
         if (w1_count[k] != w2_count[k]) { printf("The words are not anagrams."); break; }
         if (k == ALPHA_S - 1) printf("The words are anagrams.");
     }
-
     return 0;
 }
