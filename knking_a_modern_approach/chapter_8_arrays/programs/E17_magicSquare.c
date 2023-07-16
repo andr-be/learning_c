@@ -14,7 +14,10 @@
 
 #include <stdio.h>
 
-void print_array(int input[99][99], int n);
+#define ARR_MAX 99
+
+void print_array(int input[ARR_MAX][ARR_MAX], int n);
+void fill_array(int input[ARR_MAX][ARR_MAX], int n);
 
 int main(void)
 {
@@ -22,41 +25,45 @@ int main(void)
     printf("Enter size of magic square: ");
     scanf("%d", &n);
 
-    int square[99][99] = {0},
+    int square[ARR_MAX][ARR_MAX] = {0},
         i_row = 0,
         i_col = n/2;
 
     square[i_row][i_col] = 1;
-    
-    for (int i = 2; i <= n * n; i++) {
-        i_row -= 1; 
-        if (i_row < 0) i_row = n - 1;
-
-        i_col += 1; 
-        if (i_col >= n) i_col = 0;
-
-        while (square[i_row][i_col] != 0) {
-            i_row += 2; 
-            if (i_row >= n) i_row = 0;
-            i_col -= 1;
-            if (i_col < 0) i_col = n - 1;
-            
-            if (square[i_row][i_col] != 0) {
-                i_row += 1;
-                if (i_row >= n) i_row = 0;
-            }
-        }
-        square[i_row][i_col] = i;
-    }
+    fill_array(square, n);
     print_array(square, n);
+
     return 0;
 }
 
-void print_array(int input[99][99], int n) {
-    for (int j = 0; j < n; j++) {
-        for (int k = 0; k < n; k++) {
+void print_array(int input[ARR_MAX][ARR_MAX], int n) {
+    for (int j = 0; j < n; j++) 
+    {
+        for (int k = 0; k < n; k++) 
             printf("%5d", input[j][k]);
-        }
+        
         putchar('\n');
+    }
+}
+
+void fill_array(int input[ARR_MAX][ARR_MAX], int n) {
+    int i_row = 0, 
+        i_col = n/2;
+
+    input[i_row][i_col] = 1;
+
+    for (int i = 2; i <= n * n; i++) {
+        i_row = (i_row < 1) ? n - 1 : i_row - 1;
+        i_col = (i_col + 1 >= n) ? 0 : i_col + 1;
+
+        if (input[i_row][i_col] != 0) 
+        {
+            i_row = (i_row + 2 >= n) ? 0 : i_row + 2;
+            i_col = (i_col - 1 < 0) ? n - 1 : i_col - 1;
+
+            if (input[i_row][i_col] != 0)
+                i_row = (i_row + 1 >= n) ? 0 : i_row + 1;
+        }
+        input[i_row][i_col] = i;
     }
 }
