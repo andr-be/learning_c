@@ -21,15 +21,11 @@ void fill_array(int input[ARR_MAX][ARR_MAX], int n);
 
 int main(void)
 {
-    int n = 1;
+    int n = 0;
     printf("Enter size of magic square: ");
     scanf("%d", &n);
 
-    int square[ARR_MAX][ARR_MAX] = {0},
-        i_row = 0,
-        i_col = n/2;
-
-    square[i_row][i_col] = 1;
+    int square[ARR_MAX][ARR_MAX] = {0};
     fill_array(square, n);
     print_array(square, n);
 
@@ -46,23 +42,23 @@ void print_array(int input[ARR_MAX][ARR_MAX], int n) {
     }
 }
 
-void fill_array(int input[ARR_MAX][ARR_MAX], int n) {
+void fill_array(int input[ARR_MAX][ARR_MAX], int square_size) {
     int i_row = 0, 
-        i_col = n/2;
+        i_col = square_size/2;
 
     input[i_row][i_col] = 1;
 
-    for (int i = 2; i <= n * n; i++) {
-        i_row = (i_row < 1) ? n - 1 : i_row - 1;
-        i_col = (i_col + 1 >= n) ? 0 : i_col + 1;
+    for (int i = 2; i <= square_size * square_size; i++) {
+        i_row = (i_row < 1) ? square_size - 1 : i_row - 1;
+        i_col = (i_col + 1 >= square_size) ? 0 : i_col + 1;
 
         if (input[i_row][i_col] != 0) 
         {
-            i_row = (i_row + 2 >= n) ? 0 : i_row + 2;
-            i_col = (i_col - 1 < 0) ? n - 1 : i_col - 1;
+            i_row = (i_row + 2 >= square_size) ? 0 : i_row + 2;
+            i_col = (i_col - 1 < 0) ? square_size - 1 : i_col - 1;
 
             if (input[i_row][i_col] != 0)
-                i_row = (i_row + 1 >= n) ? 0 : i_row + 1;
+                i_row = (i_row + 1 >= square_size) ? 0 : i_row + 1;
         }
         input[i_row][i_col] = i;
     }
