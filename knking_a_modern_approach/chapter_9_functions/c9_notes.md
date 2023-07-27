@@ -221,5 +221,44 @@ Which is just casting the return value as a `void` type. "Casting to `void`" is 
 
 ### Program: Testing Whether a Number is Prime
 
-pg 190
+```C
+// prime.c
+// tests whether a number is prime
+
+#include <stdbool.h>
+#include <stdio.h>
+
+bool is_prime(int n)
+{
+    int divisor;
+
+    if (n <= 1)
+        return false;
+    for (divisor = 2; divisor * divisor <= n; divisor++)
+        if (n % divisor == 0)
+            return false;
+    return true;
+}
+
+int main(void)
+{
+    int n;
+
+    printf("Enter a number: ");
+    scanf("%d", &n);
+
+    if (is_prime(n))
+        printf("Prime\n");
+    else
+        printf("Not prime\n");
+
+    return 0;
+}
+```
+
+`is_prime` demonstrates, a function may have more than one `return` statement. However, we can execute just one of these statements during a given call of the function.
+
+***
+
+## 9.2 Function Declarations
 

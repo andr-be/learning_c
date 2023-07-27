@@ -18,10 +18,8 @@ bool is_armstrong_number(int input) {
         candidate /= 10;
     }
 
-    for (int j = i-1; j >= 0; j--)
+    for (int j = i - 1; j >= 0; j--)
         sum += pow(digits[j], i);
 
-    if (sum == input) return true;
-    
-    return false;
+    return sum == input;
 }
