@@ -262,3 +262,103 @@ int main(void)
 
 ## 9.2 Function Declarations
 
+C doesn't actually require you to declare entire functions before you call them. However, the compiler still needs to know that the function exists in advance.
+If it encounters a function call and doesn't know how many parameters it should take, or if they're correct, it will assume that the function returns an int properly and attempts to promote the arguments. If it later finds out that the function should have returned differently, it will then throw an error and fail to compile.
+
+One way to avoid the problem of call-before-definition is to arrange the program so that the definition of each function precedes all of its calls. This will solve the issue in some cases, but cause new ones related to structure and readability in others, and may not actually be feasible.
+
+The alternative is to declare each function before calling it. A function declaration provides the compiler with a brief glimpse at a function whose full definition will appear later. A function declaration resembles the first line of a function definition with a semicolon added at the end:
+
+```txt
+return-type  function-name  ( parameters ) ;
+```
+
+This 'function prototype' must be consistent with the later function declaration that contains the procedure to follow. The prototype provides a complete description of how to call a function, how many arguments to supply, what their types should be and what type of result will be returned.
+
+```C
+double average(double a, double b);     // function prototype
+
+int main(void) 
+{
+    // ...
+    double x = average(12.2, 13.5);     // function call
+}
+
+double average(double a, double b)      // function definition
+{
+    return (a + b) / 2;
+}
+```
+
+Function prototypes do not have to declare the names of a function's parameters, so long as the types are present. 
+
+```C
+double average(double, double);
+```
+
+But it is considered best practice not to omit them ass they help docum,ent the purpose of each parameter and remind the programmer of the order in which arguments must appear.
+
+C99 has adopted the rule that either a declaration or a definition of a function must be present prior to any call of the function. Calling a function for which the compiler has not yet seen a declaration or definition is an error.
+
+***
+
+## 9.3 Arguments
+
+***Parameters*** and ***arguments*** are not the same thing. ***Parameters*** appear in function definitions; they're dummy names that represent values to be supplied when the function is called. ***Arguments*** are expressions that appear in function calls. When the distinction between ***argument*** and ***parameter*** isn't important, ***argument*** can be used to mean either.  
+
+In C, arguments are ***passed by value***; when a function is called, each argument is evaluated and its value assigned to the corresponding parameter. Since the parameter contains a copy of the argument's value, any changes made to the parameter during the execution of a function don't affect the argument.
+
+In effect, each parameter behaves like a variables that's been initialised to the value of the matching argument. This has both advantages and disadvantages; since a parameter can be modified without affecting the corresponding argument, we can use parameters as variables within the function, reducing the number of genuine variables needed.
+
+```C
+int power(int x, int n)
+{
+    int i, result = 1;
+
+    for (i = 1; i <= n; i++)
+        result = result * x;
+
+    return result;
+}
+```
+
+Since n is a *copy* of the original exponent, we can modify it inside the function, thus removing the need for i:
+
+```C
+int power(int x, int n)
+{
+    int result = 1;
+
+    while (n-- > 0)
+        result = result * x;
+
+    return result;
+}
+```
+
+Unfortunately, C's requirement that arguments be passed by value makes it difficult to write certain kinds of functions.
+
+Suppose that we need a function that will decompose a `double` value into an integer part and a fractional part. Since a function can't ***return*** two numbers, we might try passing a pair of variables to the function and have it modify them.
+
+```C
+void decompose(double x, long int_part, double frac_part)
+{
+    int_part = (long) x;    // drops the fractional part of x
+    frac_part = x - int_part;
+}
+```
+
+Suppose we call the function in the following way:
+
+```C
+decompose(3.14159, i, d);
+```
+
+At the beginning of the call, `3.14159` is copied into `x`, `i`'s value is copied into `int_part`, and `d`'s value is copied into `frac_part`. The statements inside `decompose` then assign `3` to `int_part` and `.14159` to `frac_part`, and the function returns. Unfortunately, `i` and `d` weren't affected by the assignments to `int_part` and `frac_part`, so they have the same value after the call as they did before the call.  
+
+With some more work, `decompose` can be made to work like we intend it to, but we'll need to wait until section 11.4 after covering more of C's features.
+
+***
+
+### Argument Conversions
+
