@@ -362,3 +362,5 @@ With some more work, `decompose` can be made to work like we intend it to, but w
 
 ### Argument Conversions
 
+C allows function calls where the types of the arguments don't match the types of the parameters. The rules for whether the arguments will be converted depend on whether or not the compiler has seen a prototype for the function prior to the call.
+
