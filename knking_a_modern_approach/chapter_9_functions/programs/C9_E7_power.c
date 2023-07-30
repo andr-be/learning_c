@@ -10,28 +10,26 @@
 #include <stdio.h>
 
 int power(int x, int n);
-int power2(int x, int n);
 
 int main(void)
 {
     int x = 1, n = 0;
+    
     printf("Enter a value of x and a value of n for x^n: ");
     scanf("%d %d", &x, &n);
 
-    printf("p1: x^n == %d\n", power(x, n));
-    printf("p2: x^n == %d\n", power2(x, n));
+    printf("x^n == %d\n", power(x, n));
     return 0;
 }
 
 int power(int x, int n)
 {
-    return n == 0 ? 1 : x * power(x, n - 1);
-}
+    if (n == 0) 
+        return 1;
 
-int power2(int x, int n)
-{
-    if (n % 2 == 0) 
-        return n == 0 ? 1 : power2(x, n/2) * power2(x, n/2);
+    else if (n % 2 == 0) 
+        return power(x, n/2) * power(x, n/2);
+
     else 
-        return n == 0 ? 1 : x * power2(x, n - 1);
+        return x * power(x, n - 1);
 }
