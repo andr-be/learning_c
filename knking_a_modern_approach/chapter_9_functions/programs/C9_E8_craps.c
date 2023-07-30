@@ -40,7 +40,7 @@ int main(void)
     }
     printf("\nWINS: %d\tLOSSES: %d\n", wins, losses);
     ratio = (double) wins / (double) losses;
-    printf("W/L RATIO: %lf\n", ratio);
+    printf("W/L RATIO: %.2lf\n", ratio);
 }
 
 int roll_dice(void) {
@@ -54,7 +54,7 @@ bool play_game(void)
         total = dice_1 + dice_2,
         point;
 
-    printf("You rolled: %d & %d\n", dice_1, dice_2);
+    printf("You rolled: %d & %d (%d)\n", dice_1, dice_2, total);
 
     switch (total)
     {
@@ -75,11 +75,9 @@ bool play_game(void)
         dice_1 = roll_dice();
         dice_2 = roll_dice();
         total = dice_1 + dice_2;
-        printf("You rolled: %d & %d\n", dice_1, dice_2);
+        printf("You rolled: %d & %d (%d)\n", dice_1, dice_2, total);
 
         if (total == point) { printf("You win!\n"); return true; }
         if (total == 7)     { printf("You lose!\n"); return false; }
-        
-        printf("No dice.\n");
     }
 }
