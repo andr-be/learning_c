@@ -28,7 +28,6 @@ void analyse_hand(void);
 void print_result(void);
 void selection_sort(int n, int a[n]);
 bool has_straight(int ranks[]);
-void selection_sort(int n, int a[n]);
 int x_of_a_kind(int n, int a[n]);
 int count_pairs(int n, int a[n]);
 bool is_consec(int n, int a[n]);
