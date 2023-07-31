@@ -34,9 +34,12 @@ const char segments[10][3][3] = {
 int main(void)
 {
     int  numbers[MAX_DIGITS],
-         total = get_input(numbers);
+         total;
+         
+    total = get_input_and_total(numbers);
 
     display_number(total, numbers);
+
     return 0;
 }
 
@@ -61,10 +64,13 @@ int get_input_and_total(int a[])
 
 void display_number(int total, int numbers[total])
 {
-    for (int row = 0; row < 3; row++) {
-        for (int num = 0; num <= total; num++) {
-            for (int segment = 0; segment < 3; segment++) {
-                printf("%c", segments[numbers[num]][row][segment]);
+    for (int row = 0; row < 3; row++) 
+    {
+        for (int num = 0; num < total; num++) 
+        {
+            for (int segment = 0; segment < 3; segment++) 
+            {
+                putchar(segments[numbers[num]][row][segment]);
             }
             putchar(' ');
         }
