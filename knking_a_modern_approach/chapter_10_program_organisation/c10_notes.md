@@ -609,7 +609,7 @@ void analyse_hand(void)
     pairs = 0;
 
     // check for flush
-    for (suit - 0; suit < NUM_SUITS; suit++)
+    for (suit = 0; suit < NUM_SUITS; suit++)
         if (num_in_suit[suit] == NUM_CARDS)
             flush = true;
 
