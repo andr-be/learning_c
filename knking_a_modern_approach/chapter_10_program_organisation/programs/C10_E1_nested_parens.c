@@ -24,6 +24,7 @@ void push(char c);
 char pop(void);
 void stack_overflow(void);
 void stack_underflow(void);
+
 // brace functions
 bool left_brace(char c);
 bool right_brace(char c);
@@ -77,19 +78,16 @@ bool is_full(void)
 // add a character to the stack, overflowing if full
 void push(char c)
 {
-    if (is_full())
-      stack_overflow();
-    else
-      contents[top++] = c;
+    if (is_full()) stack_overflow();
+
+    else contents[top++] = c;
 }
 
 // remove a character from the stack, underflowing if empty
 char pop(void)
 {
-    if (is_empty())
-      stack_underflow();
-    else
-      return contents[--top];
+    if (is_empty()) stack_underflow();
+    else return contents[--top];
 
     return 0;
 }
