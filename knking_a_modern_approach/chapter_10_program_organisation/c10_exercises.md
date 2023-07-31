@@ -85,3 +85,41 @@ int main(void)
 }
 ```
 
+## Programming Exercise 7: ASCII ART NUMERALS
+
+```txt
+Enter a number: 491-9014
+     _       _   _      
+|_| |_|   | |_| | |   | |_|    
+  |  _|   |  _| |_|   |   |    
+```
+
+```txt
+ _       _   _       _   _   _   _   _                                      
+| |   |  _|  _| |_| |_  |_    | |_| |_|                                     
+|_|   | |_   _|   |  _| |_|   | |_|   |                                      
+
+ _       _   _       _   _   _   _   _ 
+| |   |  _|  _| |_| |_  |_    | |_| |_|
+|_|   | |_   _|   |  _| |_|   | |_|   |
+
+ENTER A NUMBER: 012
+
+y x z, y x z, y x z
+
+0 0 0, 0 0 1, 0 0 2     // 1st row of 0
+1 0 0, 1 0 1, 1 0 2     // 1st row of 1
+2 0 0, 2 0 1, 2 0 2     // 1st row of 2
+
+0 1 0, 0 1 1, 0 1 2     // 2nd row of 0    
+1 1 0, 1 1 1, 1 1 2     // 2nd row of 1
+2 1 0, 2 1 1, 2 1 2     // 2nd row of 2 
+
+0 2 0, 0 2 1, 0 2 2     // 3rd row of 0
+1 2 0, 1 2 1, 1 2 2     // 3rd row of 1
+2 2 0, 2 2 1, 2 2 2     // 3rd row of 2
+
+x = row
+y = num
+z = segment
+```
