@@ -26,7 +26,7 @@ int main(void)
 
 1. the `f` function - `a`, `b`, `c`
 2. the `g` function - `a`, `d`, `e`
-3. the block in which `e` is declared - `a`, `e`
+3. the block in which `e` is declared - `a`, `d`, `e`
 4. the `main` function - `a`, `f`
 
 ***

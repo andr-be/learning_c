@@ -653,4 +653,3 @@ void print_result(void)
 Q: What impact do local variables with static storage duration have on recursive functions?
 
 A: When a function is called recusrively, fresh copies are made of its automatic variales for each call. This doesn't occur for static variables, though. Instead, ***all calls of the function share the same static variables***.
-
