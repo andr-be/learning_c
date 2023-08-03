@@ -2,7 +2,7 @@
 
 > *If you have a procedure with ten parameters, you probably missed some*.
 
-A function is simply a series of statements that have been grouped together and given a name. 
+A function is simply a series of statements that have been grouped together and given a name.
 
 Functions are the building blocks of C programs. Each function is essentially a small self-contained program with its own declarations and statements. Functions are easier to reason about, allow us to avoid duplicating code and are reusable.
 
@@ -180,7 +180,7 @@ void do_nothing(void)
 
 ### Function Calls
 
-A function call consists of a function name followed by a list of arguments, enclosed in parentheses. If the parentheses are missing, the function won't get called. The result is a legal (and meaningless) expression statement that looks correct but has no effect. 
+A function call consists of a function name followed by a list of arguments, enclosed in parentheses. If the parentheses are missing, the function won't get called. The result is a legal (and meaningless) expression statement that looks correct but has no effect.
 
 ```C
 average(x, y);
@@ -190,7 +190,7 @@ print_pun();
 print_pun;      // WRONG, statement with no effect
 ```
 
-A call to a non-`void` function is always followed by a semicolon to turn it into a statement. 
+A call to a non-`void` function is always followed by a semicolon to turn it into a statement.
 
 A non-`void` function produces a value that can be stored in a variable, tested, printed or used in some other way.
 
@@ -290,7 +290,7 @@ double average(double a, double b)      // function definition
 }
 ```
 
-Function prototypes do not have to declare the names of a function's parameters, so long as the types are present. 
+Function prototypes do not have to declare the names of a function's parameters, so long as the types are present.
 
 ```C
 double average(double, double);
@@ -427,7 +427,7 @@ int f(int a[])
 // section 12.3 explains why!
 ```
 
-The following function illustrates the use of one-dimensional array arguments. 
+The following function illustrates the use of one-dimensional array arguments.  
 
 ```C
 int sum_array(int a[], int n)
@@ -615,7 +615,7 @@ A compound literal is an `lvalue`, so the values of its elements can be changed.
 
 ## 9.4 The `return` Statement
 
-A non-`void` function must use the `return` statement to specify what value it will return. 
+A non-`void` function must use the `return` statement to specify what value it will return.  
 
 ```C
 return  expression ;
@@ -634,7 +634,7 @@ More complex expressions are possible; it's not unusual to see the conditional o
 return n >= 0 ? n : 0;
 ```
 
-When this statement is executed, the expression `n >= 0 ? n : 0` is evaluated first, returning the value of `n` if it's not negative, otherwise it returns `0`. 
+When this statement is executed, the expression `n >= 0 ? n : 0` is evaluated first, returning the value of `n` if it's not negative, otherwise it returns `0`.  
 
 `return` statements may appear in functions whose return type is `void`, provided that no expression is given:
 
@@ -676,7 +676,7 @@ It's good practice to make sure every C program returns a status code, even if t
 
 ### The `exit` Function
 
-Executing a `return` statement in `main` is one way to terminate a program. Another is calling the `exit` function, which belongs to `<stdlib.h>`. The argument passed to `exit` has the same meaning as `main`'s return value: both indicate the program's status at termination. 
+Executing a `return` statement in `main` is one way to terminate a program. Another is calling the `exit` function, which belongs to `<stdlib.h>`. The argument passed to `exit` has the same meaning as `main`'s return value: both indicate the program's status at termination.  
 
 ```C
 exit(0);                // normal termination
@@ -688,7 +688,7 @@ exit(EXIT_FAILURE);     // abnormal termination
 
 `EXIT_SUCCESS` and `EXIT_FAILURE` are macros defined in `<stdlib.h>`. The values are implementation defined, typically they're 0 and 1 respectively.
 
-The difference between `return` and `exit` is that `exit` causes program termination regardless of which function calls it. The `return` statement causes program termination only when it appears in the `main` function. 
+The difference between `return` and `exit` is that `exit` causes program termination regardless of which function calls it. The `return` statement causes program termination only when it appears in the `main` function.  
 
 Some programmers exclusively use `exit` to make it easier to locate all exit points in a program.
 
@@ -712,11 +712,13 @@ Some programming languages rely heavily on recursion, while others don't even al
 i = fact(3);
 ```
 
+```txt
     fact(3) finds that 3 is not less than or equal to 1, so it calls 
         fact(2) which finds that 2 is not less than or equal to 1, so it calls
             fact(1) which finds that 1 <= 1, so it returns 1 which causes
         fact(2) to return 2 x 1 = 2, causing
     fact(1) to return 3 x 2 = 6
+```
 
 Notice how the unfinished calls of `fact` "pile up" until `fact` is finally passed 1. At that point, the old calls of fact begin to "unwind" one by one, until the original call - `fact(3)` - finally returns with the answer, 6.
 
@@ -734,6 +736,7 @@ int power(int x, int n)
 
 The call `power(5, 3)` would be executed as follows:
 
+```txt
     power(5, 3) finds that 3 is not equal to 0, so it calls
         power (5, 2), which finds 2 is not equal to 0 so it calls
             power (5, 1), which finds 1 is not equal to 0 so calls
@@ -741,6 +744,7 @@ The call `power(5, 3)` would be executed as follows:
             power(5, 1) to return 5 x 1 = 5, causing
         power (5, 2) to return 5 x 5 = 25, causing
     power(5, 3) to return 5 x 25 = 125
+```
 
 Incidentally, we can condense the `power` function a bit by putting a conditional expression in the `return` statement:
 
@@ -751,7 +755,7 @@ int power(int x, int n)
 }
 ```
 
-Both `fact` and `power` are careful to test a "termination condition" as soon as they're called. When `fact` is called, it immediately checks whether its parameter is less than or equal to 1. When `power` is called, it first checks whether its second parameter is equal to 0. 
+Both `fact` and `power` are careful to test a "termination condition" as soon as they're called. When `fact` is called, it immediately checks whether its parameter is less than or equal to 1. When `power` is called, it first checks whether its second parameter is equal to 0.  
 
 **All recursive functions need some kind of termination condition in order to prevent infinite recursion.**
 ***
@@ -780,7 +784,7 @@ We start by copying the first element into a temporary location elsewhere, leavi
 
 ![image](images/Step2.png)
 
-Next, we move the marker *high* across the array from right to left until it points to an element that's smaller than the partitioning element. 
+Next, we move the marker *high* across the array from right to left until it points to an element that's smaller than the partitioning element.  
 
 ![image](images/Step3.png)
 
@@ -792,8 +796,7 @@ We now move *low* from left to right, looking for an element that's larger than 
 
 ![image](images/Step5.png)
 
-
-When we find one, we copy it into the hole that *high* points to. 
+When we find one, we copy it into the hole that *high* points to.  
 
 ![image](images/Step6.png)
 
@@ -897,7 +900,7 @@ Although this version of Quicksort works fine, it's not the best. There are a nu
 >
 >**A:** First we need to discuss how arrays are passed in C. As Section 12.3 explains, when an array is passed to a function, the function is given a *pointer* to the first element in the array.
 >
-> Next we need to know how the subscripting operator works. Suppose that `a` is a one-dimensional array passed to a function. When we write `a[i] = 0;` the compiler generates instructions that compute the address of `a[i]` by multiplying `i` by the size of an array element and adding the result to the address that `a` represents (the pointer passed to the function). 
+> Next we need to know how the subscripting operator works. Suppose that `a` is a one-dimensional array passed to a function. When we write `a[i] = 0;` the compiler generates instructions that compute the address of `a[i]` by multiplying `i` by the size of an array element and adding the result to the address that `a` represents (the pointer passed to the function).  
 >
 > This calculation doesn't depend on the length of `a`, which explains why we can omit it when defining the function.
 
