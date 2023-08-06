@@ -7,30 +7,22 @@
 
 bool is_isogram(const char phrase[])
 {
-    int letters[NUM_LETTERS] = {0};
-    if (phrase == NULL) return false;
-
-    // populate letter count array
-    for (int i = 0; i < MAX_LETTERS; i++) {
-        if (phrase[i] == '\0') break;
-        char next = (char) toupper(phrase[i]);
-        if (isalpha(next)) letters[next - 'A']++;
+    if (!phrase) return false;
+    for (int i = 0, letters[NUM_LETTERS] = {0}; i < MAX_LETTERS; i++) 
+    {
+      if (!phrase[i]) break;
+      char next = (char) toupper(phrase[i]);
+      if (isalpha(next))
+        if (++letters[next - 'A'] > 1)
+          return false;
     }
-    // check all letters are below 2
-    for (int i = 0; i < NUM_LETTERS; i++)
-        if (letters[i] > 1) return false;
-
     return true;
 }
 
-int main(void) {
-    bool hello = is_isogram("HELLO");
-    bool isogram = is_isogram("isogram");
-    bool blank = is_isogram("");
-    bool _null = is_isogram(NULL);
-
-    printf("hello: %d\n", hello);
-    printf("isogram: %d\n", isogram);
-    printf(" : %d\n", blank);
-    printf("NULL: %d\n", _null);
+int main(void) 
+{
+  printf("hello: %s\n", is_isogram("HELLO") ? "true" : "false");
+  printf("isogram: %s\n", is_isogram("isogram") ? "true" : "false");
+  printf(" : %s\n", is_isogram("") ? "true" : "false");
+  printf("NULL: %s\n", is_isogram(NULL) ? "true" : "false");
 }
