@@ -398,7 +398,7 @@ int *find_middle(int a[], int n) {
 
 Usually, but not always. A pointer to a character may need to be stored in a different form than other pointers. A pointer to a character might consist of an address (the word in which the character is stored) plus a small integer (the position of the character within the word).
 
-On some computers, pointers may be "offsets" rather than complete addresses. For example, CPUS in the Intel x86 family can execute programs in several modes. The oldest of these, which dates back to the 8086 processor of 1978 is called ***real mode***. 
+On some computers, pointers may be "offsets" rather than complete addresses. For example, CPUS in the Intel x86 family can execute programs in several modes. The oldest of these, which dates back to the 8086 processor of 1978 is called ***real mode***.  
 
 In ***real mode*** addresses are sometimes represented by a single 16-bit number (an offset) and sometimes by two 16-bit numbers (a segment:offset pair). An offset isn't a true memory address: the CPU must combine it with a segment value stored in a special register.
 
@@ -410,9 +410,9 @@ Yes, these are known as **Function Pointers**. We'll cover them in Section 17.7.
 
 > **Q. It seems to me that there's an inconsistency between `int *p = &i;` and `p = &i;`: why isn't `p` preceded by a `*` in the statement, as it is in the declaration?**
 
-`*` can have different meanings in C, depending on the context in which it's used. In the declaration `int *p = &i;` the `*` symbol is not the indirection operator; it instead specifies the type of `p`, informing the compiler that `p` is a pointer to an `int`. 
+`*` can have different meanings in C, depending on the context in which it's used. In the declaration `int *p = &i;` the `*` symbol is not the indirection operator; it instead specifies the type of `p`, informing the compiler that `p` is a pointer to an `int`.  
 
-However, when it appears in a statement, the `*` symbol performs indirection (when used as a unary operator). The statement `*p = &i;` would be wrong because it assigns the address of `i` to the object that `p` points to, not to `p` itself. 
+However, when it appears in a statement, the `*` symbol performs indirection (when used as a unary operator). The statement `*p = &i;` would be wrong because it assigns the address of `i` to the object that `p` points to, not to `p` itself.  
 
 > **Q. How do you print the address of a variable?**
 
@@ -420,4 +420,176 @@ Any pointer, including the address of a variable, can be displayed by calling `p
 
 > **Q. does this statement: `void f(const int *p);` say that I can't modify `p`?**
 
-No, it says that `f` can't change the integer that `p` points to; it doesn't prevent `f` from changing `p` itself. However, since arguments are passed by value, assigning `p` to a new value by making it point somewhere else won't have any effect outside of the function. 
+No, it says that `f` can't change the integer that `p` points to; it doesn't prevent `f` from changing `p` itself. However, since arguments are passed by value, assigning `p` to a new value by making it point somewhere else won't have any effect outside of the function.  
+
+## Written Exercises
+
+### 1. If `i` is a variable and `p` points to `i`, which of the following expressions are aliases for `i`?
+
+```C
+1.  *p      <-- the thing pointed at by p                 (i)
+2.  &p      x   the address of p                          (a new pointer)
+3. *&p      <-- the thing pointed to by the address of p  (i)
+4. &*p      x   the address of the thing pointed at by p  (p)
+5.  *i      x   the thing pointed to by i                 (½∟1 7x1^Öƒ)
+6.  &i      x   the address of i                          (p)
+7. *&i      <-- the object at the address of i            (i)
+8. &*i      <-- the address of the object pointed to by i (i)
+```
+
+### 2. If `i` is an `int` variable and `p` and `q` are pointers to `int`, which of the following assignments are legal?
+
+```C
+1.  p =   i;    x   an int pointer is not an int
+2. *p =  &i;    x   object pointed to by p cannot be the address of i (p)
+3. &p =   q;    <-- a pointer is /technically/ an int
+4.  p =  &q;    <-- same here
+5.  p = *&q;    <-- also fine; p is an object containing the address of q
+6.  p =   q;    <-- fine, p and q are pointers
+7.  p =  *q;    x   p is not an int
+8. *p =   q;    x   i is not an int pointer
+9. *p =  &q;    x   i is not the address of a pointer
+```
+
+### 3. The following function supposedly computes the sum and average of the numbers in the array `a`, which has length `n`. `avg` and `sum` point to variables that the function should modify. Unfortunately, the function contains several errors: find and correct them.
+
+```C
+void avg_sum(double a[], int n, double *avg, double *sum)
+{
+    int i;
+
+    sum = 0.0;                 // sum is a pointer
+    for (i = 0; i < n; i++)
+        sum += a[i];           // sum is a pointer
+    avg = sum / n;             // avg and sum are pointers
+}
+```
+
+```C
+void avg_sum(double a[], int n, double *avg, double *sum)
+{
+    int i;
+
+    *sum = 0.0;                 // int pointed to by sum = 0
+    for (i = 0; i < n; i++)
+        *sum += a[i];           // int p.t.b. sum += a[i]
+    *avg = *sum / n;            // int p.t.b. avg += int p.t.b. sum / n
+}
+```
+
+### 4. Write the following function:  
+
+```C
+void swap(int *p, int *q);
+``` 
+
+When passed the addresses of the variables, `swap` should exchange the values of the variables.
+
+```C
+void swap(int *p, int *q)
+{
+    int temp = *p;
+    *p = *q;
+    *q = temp;
+}
+```
+
+### 5. Write the following function:  
+
+```C
+void split_time(long total_sec, int *hr, int *min, int *sec);
+```
+
+`total_sec` is a time represented as the number of seconds since midnight, `hr`, `min` and `sex` are pointers to variables in which the function will store the equivalent time in hours (0-23), minutes (0-59) and seconds (0-59) respectively.
+
+```C
+void split_time(long total_sec, int *hr, int *min, int *sec)
+{
+    *hr = (int) (total_sec / 60) / 60;
+
+    *min = (int) (total_sec - (*hr * 60 * 60)) / 60;
+
+    *sec = (int) total_sec - (*hr * 60 * 60) - (*min * 60);
+}
+```
+
+### 6. Write the following function:  
+
+```C
+void find_two_largest(int a[], int n, int *largest,
+                      int *second_largest);
+```
+
+When passed an array `a` of length `n`, the function will search `a` for its largest and second largest elements, storing them in the variables pointed to by `largest and second_largest` respectively.
+
+```C
+void find_two_largest(int a[], int n, int *largest, int *second_largest)
+{
+    *largest = *second_largest = a[0];
+
+    for (int i = 0; i < n; i++)
+        if (a[i] > *largest) 
+            *largest = a[i];
+
+    for (int i = 0; i < n; i++)
+        if (a[i] > *second_largest && a[i] != *largest) 
+            *second_largest = a[i];
+}
+```
+
+### 7. Write the following function:  
+
+```C
+void split_date(int day_of_year, int year, int *month, int *day);
+```
+
+`day_of_year` is an integer between 1 and 366, specifying a particular day within the year designated by `year`. `month` and `day` point to variables in which the function will store the equivalent month (1-12) and day within that month (1-31).
+
+```C
+void split_date(int day_of_year, int year, int *month, int *day)
+{
+    int Months = {
+        31, 28, 31, 30,     // JAN FEB MAR APR
+        31, 30, 31, 31,     // MAY JUN JUL AUG
+        30, 31, 30, 31      // SEP OCT NOV DEC
+    };
+
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) 
+        Months[1]++;        // adds a day to February on leap years
+
+    for (int i = 0; i < 12; i++) {
+        // take every month's days away from the total
+        day_of_year -= Months[i];
+        // if you go below 0, you're in that month
+        if (day_of_year < 0) 
+        {
+            *day = day_of_year + Months[i];
+            *month = i + 1;
+            return;
+        }
+    }
+}
+```
+
+### 8. Write the following function:  
+
+```C
+int *find_largest(int a[], int n);
+```
+
+When passed an array `a` of length `n`, the function will return a pointer to the array's largest element.
+
+```C
+int *find_largest(int a[], int n)
+{
+    if (!n) return NULL;
+
+    int *largest = &a[0];
+
+    for (int i = 1; i < n; i++)
+        if (a[i] > *largest) 
+            largest = &a[i];
+
+    return largest;
+}
+```
