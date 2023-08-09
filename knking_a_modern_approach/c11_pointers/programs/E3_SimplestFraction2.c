@@ -1,5 +1,5 @@
 // SIMPLEST FRACTION
-// andr-be 06/2023
+// andr-be 08/2023
 /*
     This program uses Euclid's method to find the highest common
     divisor of two numbers to calculate a simplified fraction.
@@ -14,7 +14,7 @@ typedef struct frac {
     int d;
 } frac;
 
-int gc_div(int, int) ;
+int gc_div(int, int);
 frac from_ints(int, int);
 frac from_user(void);
 frac gc_simp(frac);
@@ -48,7 +48,7 @@ void reduce(int numerator, int denominator, int *reduced_numerator, int* reduced
 int gc_div(int n, int m) 
 {
     if (n == 0 || m == 0)
-        return (n == 0) ? m : n;
+        return (m > n) ? m : n;
     
     while (n != 0) {
         int temp = m % n;

@@ -1,5 +1,5 @@
 // FLIGHT DEPARTURE CALCULATOR
-// andr-be 06/2023
+// andr-be 08/2023
 /*
     Made some pointless additions that allow it to operate with
     pointers? Didn't really need to do this considering the 

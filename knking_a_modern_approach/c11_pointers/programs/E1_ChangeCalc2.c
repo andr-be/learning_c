@@ -1,5 +1,5 @@
 // DOLLAR BILL CHANGE CALCULATOR V2
-// andr-be 2023
+// andr-be 08/2023
 /*
     This version uses pointers!
 */
