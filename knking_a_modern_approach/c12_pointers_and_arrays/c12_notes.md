@@ -897,6 +897,7 @@ int find_largest(int *a, int n)
 void print_highest_temp_per_day(const int *a)
 {
     printf("YOUR WEEKLY HIGHS: \n";)
+    
     for (int i = 0; i < DAYS_IN_WEEK; i++)
         printf("%s:\t%d DEG C\n", day_string(i), find_largest(a[i], HOURS_IN_DAY));
 }
@@ -1015,9 +1016,9 @@ int evaluate_position(char board[8][8])
         case 'R': sum += 5; break;
         case 'r': sum -= 5; break;
 
-        case 'B': 
+        case 'B': /*    f-t    */
         case 'N': sum += 3; break;
-        case 'b': 
+        case 'b': /*    f-t    */
         case 'n': sum -= 3; break;
 
         case 'P': sum += 1; break;
@@ -1025,7 +1026,7 @@ int evaluate_position(char board[8][8])
 
         default: break;
         }
-        
+
     return sum;
 }
 ```
