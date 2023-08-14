@@ -7,7 +7,8 @@
     "settings": {
         "files.associations": {
             "stdio.h": "c",
-            "limits": "c"
+            "limits": "c",
+            "type_traits": "c"
         }
     }
 }
