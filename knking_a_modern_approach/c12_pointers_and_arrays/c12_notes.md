@@ -471,19 +471,19 @@ for (p = a; p < a + m; p++)
 
 ## Q&A: Pointers & Arrays
 
-> ***Q. If a pointer is an address, does that mean that an expression like `p + j` adds `j` to the address stored in `p`?***
+> ***If a pointer is an address, does that mean that an expression like `p + j` adds `j` to the address stored in `p`?***
 >
-> A. No, integers used in pointer arithmetic are scaled depending on the type of the pointer. If `p` is of type `int *`, then `p + j` typically adds $4 \times$ `j` to `p`, assuming that `int` values are stored using 4 bytes. If `p` has the type `double *`, the `p + j` will probably add $8 \times$ `j` to `p`, since `double` values are usually 8 bytes long.
+> No, integers used in pointer arithmetic are scaled depending on the type of the pointer. If `p` is of type `int *`, then `p + j` typically adds $4 \times$ `j` to `p`, assuming that `int` values are stored using 4 bytes. If `p` has the type `double *`, the `p + j` will probably add $8 \times$ `j` to `p`, since `double` values are usually 8 bytes long.
 
-> ***Q. When writing an array traversal loop, is it better to use array subscripting or pointer arithmetic?***
+> ***When writing an array traversal loop, is it better to use array subscripting or pointer arithmetic?***
 >
-> A. There's no easy answer, but for the most part unless you're working on a PDP-11 it basically doesn't make any difference in terms of performance. Learn both ways and use whichever is more natural for the kind of program you're writing.
+> There's no easy answer, but for the most part unless you're working on a PDP-11 it basically doesn't make any difference in terms of performance. Learn both ways and use whichever is more natural for the kind of program you're writing.
 
-> ***Q. I read somewhere that `i[a]` is the same as `a[i]`; is this true?***
+> ***I read somewhere that `i[a]` is the same as `a[i]`; is this true?***
 >
-> A. Yes, oddly enough. The compiler treats `i[a]` as `*(i + a)`, which is the same as `*(a + i)`, which is equivalent to `a[i]`. Pointer addition, like regular addition, is commutative. However, this is a very odd thing to do and will confuse anyone reading your code.
+> Yes, oddly enough. The compiler treats `i[a]` as `*(i + a)`, which is the same as `*(a + i)`, which is equivalent to `a[i]`. Pointer addition, like regular addition, is commutative. However, this is a very odd thing to do and will confuse anyone reading your code.
 
-> ***Q. Is it better style to declare an array parameter as \*a or `a[]`?***
+> ***Is it better style to declare an array parameter as \*a or `a[]`?***
 >
 > Some programmers switch between `*a` and `a[]` depending on whether the function uses pointer arithmetic or subscripting to access the elements of the array. In practice, `*a` is far more common than `a[]`, so you'd better get used to it. Dennis Ritchie refers to the `a[]` notation as "a living fossil" that "serves as much to confuse the learner as to alert the reader".
 
@@ -897,7 +897,7 @@ int find_largest(int *a, int n)
 void print_highest_temp_per_day(const int *a)
 {
     printf("YOUR WEEKLY HIGHS: \n";)
-    
+
     for (int i = 0; i < DAYS_IN_WEEK; i++)
         printf("%s:\t%d DEG C\n", day_string(i), find_largest(a[i], HOURS_IN_DAY));
 }

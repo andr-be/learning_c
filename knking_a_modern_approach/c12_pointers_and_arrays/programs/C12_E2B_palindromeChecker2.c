@@ -33,18 +33,17 @@ char* get_message(void)
 
 bool is_palindrome_ptr(char *msg)
 {
-    bool palindrome = true;
-    char *p = msg,
+    char *p,
          *stripped = calloc(MAX_LEN, sizeof(char)),
          *q = stripped;
 
-    for (; *p != '\n'; p++) 
+    for (p = msg; *p != '\n'; p++) 
         if (isalpha(*p)) *q++ = (char) tolower(*p);
 
+    bool palindrome = true;
     for (p = stripped, q--; q >= p;)
         if (*p++ != *q--) palindrome = false;
 
     free(stripped);
-
     return palindrome;
 }
