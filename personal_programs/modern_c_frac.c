@@ -1,10 +1,12 @@
 // MODERN C STYLE FRACTION CALCULATOR
-// andr-be 06/2023
+// andr-be 08/2023
 /*
     After watching a talk on Modern C conventions by Luca Sas, 
     I was inspired to re-write this calculator to implement
     some of the stylistic conventions of the community that uses 
     and works with C daily in 2023.
+
+    update 16/08/23: fixed logic errors in program
 */
 
 #include <stdio.h>
@@ -24,6 +26,7 @@ frac frac_mult(frac l, frac r);
 frac frac_divi(frac l, frac r);
 frac frac_subt(frac l, frac r);
 frac frac_simp(frac input);
+int gcd(int a, int b);
 void frac_prnt(frac input);
 two_fracs get_two(void);
 
@@ -134,25 +137,29 @@ frac frac_divi(frac l, frac r)
 
 frac frac_subt(frac l, frac r)
 {
-    int m_factor = (l.d > r.d) ? l.d : r.d;
     frac result = {
-        .n = m_factor * (l.n + r.n),
-        .d = m_factor * (l.d + r.d)
+        .n = l.n * r.n - r.n * l.d,
+        .d = l.d * r.d
     };
     return result;
 }
 
 frac frac_simp(frac input)
 {
-    frac result = {input.n, input.d};
-    for (int div = input.d; div > 1; div--)
-        if (input.n % div == 0 && input.d % div == 0) {
-            result.n = input.n / div;
-            result.d = input.d / div;
-            break;
-        }
+    int divisor = gcd(input.n, input.d);
+    frac result = {input.n / divisor, input.d / divisor};
     return result;
-} 
+}
+
+int gcd(int a, int b)
+{
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
 
 void frac_prnt(frac input)
 {

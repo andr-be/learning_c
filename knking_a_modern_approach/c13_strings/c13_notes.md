@@ -136,7 +136,7 @@ This simple approach comes with particular difficulties:
 - it is hard to tell whether an array of characters is being used as a string
 - when we write our own string handling functions we need to deal with the null character
 
-> Incidentally, finding null is also the fastest way to determine the length of a string.
+Finding null is also typically the fastest way to determine the length of a string.
 
 If we need a variable capable of storing a string of up to 80 characters, we have to declare the array with an array size of 81:
 
@@ -206,7 +206,23 @@ Using an uninitialised pointer variable as a string is a serious error as trying
 
 ## 13.3 Reading and Writing Strings
 
+Writing a string is simple enough, as `printf` and `puts` are easy to handle functions.
+
+Reading a string is somewhat harder; there's a possibility when reading that the input string may be longer than the variable in which you attempt to store it.
+
+To read a string in a single step, we can either use `scanf` or `gets`, or we can read them one character at a time.
+
 ### Writing Strings Using `printf` and `puts`
+
+The `%s` conversion specifier allows `printf` to write a string. 
+
+```C
+char str[] = "Are we having fun yet?";
+
+printf("%s!\n", str);    // Are we having fun yet?!
+```
+
+`printf` writes characters one by one until it encounters a null character. If it's missing, it'll continue past the end of the string until it eventually finds a null character somewhere in memory.
 
 ### Reading Strings Using `scanf` and `gets`
 
@@ -216,13 +232,13 @@ Using an uninitialised pointer variable as a string is a serious error as trying
 
 ## 13.5 Using the C String Library
 
-### `strcpy` -> String Copy
+### `strcpy()` -> String Copy
 
-### `strlen` -> String Length
+### `strlen()` -> String Length
 
-### `strcat` -> String Concatenation
+### `strcat()` -> String Concatenation
 
-### `strcmp`` -> String Comparison
+### `strcmp()` -> String Comparison
 
 ### Program: Priting a One-Month Reminder List
 
@@ -237,3 +253,19 @@ Using an uninitialised pointer variable as a string is a serious error as trying
 ### Command-Line Arguments
 
 ### Program: Checking Planet Names
+
+## Strings: Q&A
+
+## Written Exercises
+
+### 1.
+
+### 2.
+
+### 3.
+
+### 4.
+
+### 5.
+
+### 6.
