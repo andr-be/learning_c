@@ -1,47 +1,48 @@
 #include "pythagorean_triples.h"
 
-// 12:        3,   4,   5
-// 108:      27,  36,  45
-// 1000:    200, 375, 425
+// 12:        3,     4,     5
+// 108:      27,    36,    45
+// 1000:    200,   375,   425
+// 30000:  1200, 14375, 14425
+//         1875, 14000, 14125 
+//         5000, 12000, 13000 
+//         6000, 11250, 12750 
+//         7500, 10000, 12500
 
+#define BIG_SUM 500
 
 int main(void)
 {
-    //test_all();
-    test_case(12);
-    test_case(36);
-    test_case(108);
-    test_case(840);
-    test_case(1000);
+    test_all();
     return 0;
 }
 
 triplets_t *triplets_with_sum(uint16_t sum)
 {
-    size_t max_size = sum / 2;
+    size_t max_size = (sum < BIG_SUM) ? sum / 2 : BIG_SUM / 2;
     triplets_t *result = malloc(sizeof(triplets_t) + sizeof(triplet_t) * max_size);
     if (!result || !sum) return NULL;
 
     result->count = 0;
 
-    for (uint16_t m = 1; m <= sum; m++) {
-        for (uint16_t n = 1; n < m; n++) 
+    for (int m = 2; m <= (int) max_size; m++) {
+        for (int n = 1; n < m; n++) 
         {
             // generate primitive triplet
-            uint16_t a = (m * m) - (n * n),
-                     b = (m * n) + (m * n),
-                     c = (m * m) + (n * n),
-                     working_sum = a + b + c;
+            int a = (m * m) - (n * n),
+                b = (m * n) + (m * n),
+                c = (m * m) + (n * n),
+                test_sum = a + b + c;
 
-            if (working_sum > sum) return result;
+            if (test_sum > sum) break;
 
             // check primitive and composite triplets
-            for (uint16_t k = 1; k * working_sum <= sum; k++) 
+            for (int k = 1; k * test_sum <= sum; k++) 
             {
                 // generate composite triplet by multiplying each side by k (which increments)
-                uint16_t n_a = a * k,
-                         n_b = b * k,
-                         n_c = c * k;
+                uint16_t n_a = (uint16_t) a * k,
+                         n_b = (uint16_t) b * k,
+                         n_c = (uint16_t) c * k;
 
                 // check this is a valid solution
                 if (is_valid(n_a, n_b, n_c, sum)) 
@@ -64,9 +65,30 @@ void free_triplets(triplets_t *triplets)
     free(triplets);
 }
 
-bool is_valid(uint16_t a, uint16_t b, uint16_t c, uint16_t sum)
+bool is_valid(int a, int b, int c, uint16_t sum)
 {
-    return a < b && a < c && b < c && a + b + c == sum;
+    int _sum = (int) sum;
+    
+    return b < c && a < c
+        && a + b + c == _sum
+        && (a * a) + (b * b) - (c * c) == 0;
+}
+
+bool is_same(triplet_t a, triplet_t b)
+{
+    return ((a.c == b.c) 
+        && ((a.a == b.a && a.b == b.b) 
+        ||  (a.a == b.b && a.b == b.a)));
+}
+
+bool is_duplicate(triplet_t entry, triplets_t *list)
+{
+    if (!list->count) return false;
+
+    for (size_t i = 0; i < list->count; i++)
+        if (is_same(list->triplets[i], entry)) return true;
+    
+    return false;
 }
 
 void test_all(void)
@@ -90,21 +112,4 @@ void test_case(uint16_t test_sum)
             printf("%5d: %5d, %5d, %5d\n", test_sum, new->triplets[j].a, new->triplets[j].b, new->triplets[j].c);
     }
     else printf("%5d: NO VALID TRIPLETS\n", test_sum);
-}
-
-bool is_same(triplet_t a, triplet_t b)
-{
-    return a.a == b.a 
-        && a.b == b.b 
-        && a.c == b.c;
-}
-
-bool is_duplicate(triplet_t entry, triplets_t *list)
-{
-    if (!list->count) return false;
-
-    for (size_t i = 0; i < list->count; i++)
-        if (is_same(list->triplets[i], entry)) return true;
-    
-    return false;
 }

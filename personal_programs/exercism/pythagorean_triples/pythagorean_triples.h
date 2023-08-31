@@ -19,7 +19,7 @@ typedef struct triplets_t {
 
 triplets_t *triplets_with_sum(uint16_t sum);
 void free_triplets(triplets_t *triplets);
-bool is_valid(uint16_t a, uint16_t b, uint16_t c, uint16_t sum);
+bool is_valid(int a, int b, int c, uint16_t sum);
 bool is_same(triplet_t a, triplet_t b);
 bool is_duplicate(triplet_t entry, triplets_t *list);
 void test_case(uint16_t test_sum);
