@@ -10,13 +10,13 @@ int main(void) {
         brr[] = { 1, 3, 4, 6, 8, 9, 11 },   b =  6, 
         crr[] = { 1, 3, 4, 6, 8, 9, 11 },   c =  1,
         drr[] = { 1, 3, 4, 6, 8, 9, 11 },   d = 11,
-        err[] = { 1, 2, 4, 5, 6, 8, 9 }, e =  9;
+        err[] = { 1, 2, 4, 5, 6, 8,  9 },   e =  9;
 
     const int *a_a = binary_search(a, arr, 1),
               *b_b = binary_search(b, brr, 7),
               *c_c = binary_search(c, crr, 7),
               *d_d = binary_search(d, drr, 7),
-              *e_e = binary_search(e, err, );
+              *e_e = binary_search(e, err, 7);
 
 
     if (a_a != 0) printf("%p: %d\n", a_a, *a_a);

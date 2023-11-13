@@ -12,6 +12,7 @@
 
 const int *binary_search(int value, const int *arr, size_t length);
 void safe_print(int *result);
+size_t midpoint(size_t high, size_t low);
 
 int main(void) {
     int arr[] = { 6 },                      a = 10,

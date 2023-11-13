@@ -668,28 +668,823 @@ We'll discuss several improvements in the programming projects at the end of thi
 
 ## 13.6 String Idioms
 
+A lot of C idioms are dedicated to the manipulation of strings. We'll explore some of the more famous idioms by using them to write `strlen` and `strcat` functions.
+
+The concise style used in this section is popular with many C programmers, and should be mastered even if you plan to adopt a different style as you're likely to encounter it in code written by others.
+
+As section 21.1 explains, we're not allowed to write a function that has the same name as a standard library function, even if we don't include the header to which the function belongs. In fact, all names that begin with `str` and a lower-case letter are reserved (to allow functions to be added to the `<string.h>` header in the future).
+
 ### Searching for the End of a String
+
+Many string operations require searching for the end of a string. `strlen` is a prime example. The following version searches its string argument to find the end, using a variable to track it.
+
+```C
+size_t strlen(const char *s)
+{
+  size_t n;
+
+  for (n = 0; *s != '\0'; s++)
+    n++;
+
+  return n;
+}
+```
+
+How do we condense this function? 
+
+- move the initialisation of `n` to its declaration
+- `*s != '\0'` == `*s! = 0` == `*s`
+- increment `s` and test `*s` in the same expression
+- replace the `for` loop with a `while`
+
+```C
+size_t strlen(const char *s)
+{
+  size_t n = 0;
+
+  while (*s++) n++;
+
+  return n;
+}
+```
+
+While more condensed, this isn't actually any faster. However, we can conceive of a version that *should* run faster, with some compilers anyway.
+
+```C
+size_t strlen(const char *s)
+{
+  const char *p = s;
+
+  while (*s) s++;
+
+  return s - p;
+}
+```
+
+This version of `strlen` computes the length of the string by locating the position of the null character, then subtracting it from the position of the first-character in the string. The improvement in speed comes from not having to increment `n` inside the `while` loop.
+
+```C
+// idiom 1
+while (*s)
+  s++;
+
+// idiom 2
+while (*s++)
+  ;
+```
+
+Both of these fragments mean *"search for the null character at the end of a string"*. The first leaves the pointer pointing at a null character. The second version is more concise, but leaves `s` pointing just past the null character.
 
 ### Copying a String
 
+Copying a string is another common operation. To introduce C's string copy idiom, we'll develop two versions. Let's start with a straightforward but somewhat lengthy version of the `strcat` function: 
+
+```C
+char *strcat(char *s1, const char *s2)
+{
+  char *p = s1;
+
+  while (*p != '\0') 
+    p++;
+
+  while (*s2 != '\0') {
+    *p = *s2;
+    p++;
+    s2++;
+  }
+
+  *p = '\0';
+  return s1;
+}
+```
+
+This is a two-step algorithm:
+
+1) Locate the null character at the end of the string `s1` and make `p` point to it
+2) Copy characters one by one from `s2` where `p` is pointing
+
+The first while statement in the function performs step 1. `p` is set to point to the fitst character in the s1 string. `p` is then incremeneted as long as it doesn't point to a null character. When the loop terminates, `p` must be pointing to the null character.
+
+The second while statement implements step 2. The loop body copies one character from where `s2` points to where `p` points, then increments both `p` and `s2`. The loop terminates when `s2` points to the null character. AFter putting a null character where `p` is pointing, `strcat` returns.
+
+By a process similar to the one we used for `strlen`, we can also condense this function into the following:
+
+```C
+char *strcat(char *s1, const char *s2)
+{
+  char *p = s1;
+
+  while (*p) 
+    p++;
+  while (*p++ = *s2++)
+    ;
+  return s1;
+}
+```
+
+Pay special attention to the `while (*p++ = *s2++)` line; it copies a character from where `s2` points to where `p` points. After the assignment, both `p` and `s2` are incremented, thanks to the `++` operators. Repeatedly executing this expression has the effect of copying a series of characters from where `s2` points to where `p` points.
+
+What causes the loop to terminate? As the primary operator inside the brackets is assignment, the `while` statement tests the value of the assignment: the character that was copied. All characters except the null character test true, so the loop won't terminate until the null character has been copied. Similarly, as the loop terminates *after* the assignment, we don't need a separate statement that puts a null character at the end of the new string.
+
 ## 13.7 Arrays of Strings
+
+One question you'll encounter often is "What is the best way to store an array of strings?" 
+
+The obvious answer is to create a two-dimensional array of characters, then satore the strings in the array, one per row. 
+
+```C
+char planets[][8] = { "Mercury", "Venus", "Earth",
+                      "Mars", "Jupiter", "Saturn",
+                      "Uranus", "Neptune", "Pluto" };
+```
+
+Note that we're allowed to omit the number of rows in the `planets` array - since that's obvious from the number of elements in the initialiser - C still requires that we specify the number of columns.
+
+Not all of our strings were long enough to fill an entire row of the array, so C padded them will null characters.
+
+```C
+    0   1   2   3   4   5   6   7   
+0   M   e   r   c   u   r   y   \0 
+1   V   e   n   u   s   \0  \0  \0 
+2   E   a   r   t   h   \0  \0  \0 
+3   M   a   r   s   \0  \0  \0  \0 
+4   J   u   p   i   t   e   r   \0 
+5   S   a   t   u   r   n   \0  \0 
+6   U   r   a   n   u   s   \0  \0 
+7   N   e   p   t   u   n   e   \0 
+8   P   l   u   t   o   \0  \0  \0 
+```
+
+The inefficiency of these examples is common when working with strings, since most string collections will contain a mixture of long and short strings. 
+
+Instead, we need a *ragged array*: a 2d array whose rows can have different lengths. There's no native data type for this, instead we creatre an array whose elements are pointers to strings.
+
+```C
+char *planets[] = { "Mercury", "Venus", "Earth",
+                    "Mars", "Jupiter", "Saturn",
+                    "Uranus", "Neptune", "Pluto" };
+```
+
+This is a minor syntactical shift, but the effect on the storage efficiency is notable.
+
+```C
+planets    
+0 [-]->  M e r c u r y \0 
+1 [-]->  V e n u s \0 
+2 [-]->  E a r t h \0   
+3 [-]->  M a r s \0 
+4 [-]->  J u p i t e r \0 
+5 [-]->  S a t u r n \0 
+6 [-]->  U r a n u s \0 
+7 [-]->  N e p t u n e \0 
+8 [-]->  P l u t o \0 
+```
+
+To access one of the planet names, all we need to do iss subscript the `planets` array, in the same way we would access an element in a two dimensional array.
+
+To search the planets array for strings beginning with the letter M, we could use the following loop:
+
+```C
+for (i = 0; i < 9; i++)
+  if (planets[i][0] == 'M')
+    printf("%s begins with M\n", planets[i]);
+```
 
 ### Command-Line Arguments
 
+When we run a program, we'll often need to supply it with information; often things like filenames or option tags to alter the way the program runs. Consider the UNIX `ls` command:
+
+```shell
+ls             "lists every non-hidden file and directory in the current directory"
+ls -l          "formats the output to be much more detailed with permissions, sizes, etc."
+ls -l remind.c "will only display detailed information about the file 'remind.c'"
+```
+
+Command line information is available to all programs, not just operating system commands. To get access to these ***command-line arguments***, also known as program parameters, we must define `main` in a particular way:
+
+```C
+int main(int argc, char *argv[])
+{
+  ...
+}
+```
+
+`argc` or **Argument Count** is the number of command-line arguments supplied to the program (including the name of the program itself)
+
+`argv` or **Argument Vector** is an array of pointers to the command-line arguments, which are stored in string form. `argv[0]` points to the name of the program, while `argv[1]` through `argv[argc-1]` point to the remaining command-line arguments. `argv` has one additional element, `argv[argc]`, which is always a *null pointer* - a special pointer that points to nothing.
+
+If the user enters the command `ls -l remind.c`  :
+
+- `argc` will be 3
+- `argv[0]` will point to a string containing the program name
+- `argv[1]` will point to the string `"-l"`
+- `argv[2]` will point to the string `"remind.c"`
+- `argv[3]` will be a null pointer
+
+```C
+ argv    
+0 [-]--> // program name 
+1 [-]--> - l \0 
+2 [-]--> r e m i n d . c \0  
+3 [/]
+```
+
+Depending on your operating system, the program name can include a path or other information. If the program name isn't available, `argv[0]` points to an empty string.
+
+As `argv` is an array of pointers, accessing command-line arguments is quite easy. Typically, a program that expects them will set up a loop that examines each argument in turn. The following loop prints the command-line arguments, one per line:
+
+```C
+int i;
+
+for (i = 1; i < argc; i++)
+  printf("%s\n", argv[i]);
+```
+
+Another technique is to set up a pointer to `argv[1]`, then increment the pointer repeatedly to step through the rest of the array. Since the last element of `argv`is always a null pointer, the loop can terminate when it finds a null pointer in the array.
+
+```C
+char **p;
+
+for (p = &argv[1]; *p != NULL; p++)
+  printf("%s\n", *p);
+```
+
+`p` is a pointer to a pointer to a character, we've got to use it carefully. Setting `p` equal to `&argv[1]` makes sense; `argv[1]` is a pointer to a character, so `&argv[1]` is a pointer to a pointer. 
+
+The test `*p != NULL` is fine, since `*p` and `NULL` are both pointers. 
+
+Incrementing `p` looks good, `p` points to an array element, so incrementing it will advance it to the next element.
+
+Printing `*p` is fine, since `*p` points to the first character in a string.
+
 ### Program: Checking Planet Names
+
+This program is designed to check a series of strings to see which ones are names of planets. When the program is run, the user will put the strings to be tested on the command line:
+
+```text
+planet Jupiter venus Earth fred
+```
+
+The program will indicate whether or not each string is a planet name: if it is, the program will also display the planet's number (with planet 1 being the one closest to the Sun):
+
+```text
+Jupiter is planet 5
+venus is not a plent
+Earth is planet 3
+fred is not a planet
+```
+
+Notice that the program doesn't recognise a string as a planet name unless its first letter is upper-case and its remaining letters are lower-case.
+
+```C
+// planet.c
+// checks planet names
+
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_PLANETS 9
+
+int main(int argc, char *argv[])
+{
+  char *planets[] = { "Mercury", "Venus", "Earth",
+                      "Mars", "Jupiter", "Saturn",
+                      "Uranus", "Neptune", "Pluto" };
+
+  int i, j;
+
+  for (i = 1; i < argc; i++) {
+    for (j = 0; j < NUM_PLANETS; j++)
+      if (strcmp(argv[i], planets[j]) == 0) {
+        printf("%s is planet %d\n", argv[i], j + 1);
+        break;
+      }
+    if (j == NUM_PLANETS)
+      printf("%s is not a planet\n", argv[i]);
+  }
+
+  return 0;
+}
+```
 
 ## Strings: Q&A
 
+**Q: How long can a string literal be?**
+
+A: The C89 standard specifies that compilers must allow string literals to be at least 509 characters long. (Don't ask...) C99 increases the minimum to 4095 characters.
+
+**Q: Why aren't string literals called "string constants"?**
+
+A: Because they're not necessarily constant. Since string literals are accessed through pointers, there's nothing to prevent a program from attempting to modify the characters in a string literal.
+
+**Q: How do we write a string literal that represents "über" if "\xfcber" doesn't work?**
+
+A: The secret is to write two adjacent string literals and let the compiler join them into one. In this example, writing "\xfc" "ber" will give us a string literal that represents the word "über".
+
+**Q: If `printf` and `scanf` expect their first argument to have type `char *`, does that mean that the argument can be a string variable instead of a string literal?**
+
+A: Yes, here's an example:
+
+```C
+char fmt[] = "%d\n";
+int i;
+
+printf(fmt, i);
+```
+
+This ability opens the door to some intriguing possibilities - reading a format string as input, for example.
+
+**Q: How can `read_line` detect whether `getchar` has failed to read a character?**
+
+A: If it can't read a character, either because of an error or because of end-of-file, `getchar` returns the value `EOF`, which has type `int`. Here's a revised version of `read_line` that tests whether the return value of `getchar` is `EOF`.
+
+```C
+int read_line(char str[], int n)
+{
+  int ch, i = 0;
+
+  while ((ch = getchar()) != '\n' && ch != EOF)
+    if (i < n)
+      str[i++] = ch;
+    str[i] = '\0';
+    return i;
+}
+```
+
 ## Written Exercises
 
-### 1.
+### 1. The following function calls supposedly write a single new-line character, but some are incorrect. Identify which calls don't work and explain why:
 
-### 2.
+```C
+a) printf("%c", '\n');    // correct
+b) printf("%c", "\n");    // wrong: you're trying to print a string as a char
 
-### 3.
+c) printf("%s", '\n');    // wrong: you're trying to print a char as a string
+d) printf("%s", "\n");    // correct
 
-### 4.
+e) printf('\n');          // wrong, printf requires a string literal / variable
+f) printf("\n");          // correct
 
-### 5.
+g) putchar('\n');         // correct
+h) putchar("\n");         // wrong, putchar can't put a string literal
 
-### 6.
+i) puts('\n');            // wrong, puts() only prints strings
+j) puts("\n");            // wrong, prints two newlines
+k) puts("");              // correct, puts() appends a newline to the output
+```
+
+### 2. Suppose that `p` has been declared as follows: `char *p = "abc";`
+
+Which of the following function calls are legal? Show the output produced by each legal call and explain why the others are illegal.
+
+```C
+a) putchar(p);    // wrong: trying to place a pointer variable as a character
+
+b) putchar(*p);   // legal
+
+c) puts(p);       // legal
+
+d) puts(*p);      // wrong
+```
+
+### 3. Suppose that we call `scanf` as follows: `scanf(%d%s%d", &i, s, &j);`
+
+If the user enters `12abc34 56def78`, what will be the values of `i`, `s` and `j` after the call? (Assume that `i` and `j` are `int` variables and `s` is an array of characters.)
+
+- `i`: 12
+- `s`: abc34
+- `j`: 56
+
+`scanf` parses the `'1'`, then the `'2'`, then it hits an `'a'` and halts, because it cannot build an integer with a character. `12` is assigned to `i`.
+
+`scanf` then parses `abc34` as a string variable, stopping at the `' '` character `abc34` is assigned to `s`.
+
+`scanf` then ignores the whitespace and parses `'5'` and `'6'`, halting on `'d'`. This assigns the value of `56` to `j`.
+
+### 4. Modify the `read_line` function in each of the following ways:
+
+```C
+int read_line(char str[], int n)
+{
+  int ch, i = 0;
+
+  while ((ch = getchar()) != '\n')
+    if (i < n) str[i++] = ch;
+
+  str[i] = '\0';      // terminates the string
+  return i;           // returns number of stored chars
+}
+
+// a) Have it skip white space before beginning to store input characters.
+int read_line_skip_whitespace(char str[], int n)
+{
+  int ch, i = 0;
+
+  while ((ch = getchar()) != '\n') 
+  {
+    if ((i == 0) && (ch == ' ')) 
+      continue;
+
+    if (i < n) 
+      str[i++] = ch;
+  }
+
+  str[i] = '\0';
+  return i;
+}
+
+// b) Have it stop reading at the first white-space character. Hint: To determine whether or 
+//    not a character is white space, call the `isspace` function.
+#include <stdbool.h>
+int read_line_until_whitespace(char str[], int n)
+{
+  int ch, i = 0;
+
+  while ((ch = getchar()) != '\n' && isspace(ch) == false)
+    if (i < n) str[i++] = ch;
+
+  str[i] = '\0';
+  return i;
+}
+
+// c) Have it stop reading at the first new-line character, then store the new-line character 
+//    in the string.
+int read_line_until_newline_and_store(char str[], int n)
+{
+  int ch, i = 0;
+
+  while ((ch = getchar()) != '\n') {
+    if (i < n) 
+      str[i++] = ch;
+  }
+
+  if (ch == '\n') {
+    str[i++] = ch;
+  }
+  
+  str[i] = '\0';
+  return i;
+}
+
+// d) Have it leave behind characters that it doesn't have room to store.
+int read_line(char str[], int n)
+{
+  int ch, i = 0;
+
+  while (ch != '\n') {
+    scanf("%c", &ch)
+    if (i < n) 
+      str[i++] = ch;
+  }
+
+  str[i] = '\0';      // terminates the string
+  return i;           // returns number of stored chars
+}
+
+```
+
+### 5. Write a function named capitalize that capitalizes all letters in its argument. The argument will be a null-terminated string containing arbitrary characters, not just letters.
+
+a) Use array subscripting to access the charactes in the string. *Hint: Use the `toupper` function to convert each character to upper-case.*
+
+```C
+#include <ctype.h>
+
+int capitalize(char str[])
+{
+  int edits = 0;
+
+  for (int i = 0; str[i] != '\0'; i++) {
+    if (isalpha(str[i])) {
+      str[i] = toupper(str[i]);
+      edits++;
+    }
+  }
+
+  return edits;
+}
+```
+
+b) Rewrite the `capitalize` function, this time using pointer arithmetic to access the characters in the string.
+
+```C
+int capitalize_ptr(char *str)
+{
+  int edits = 0;
+
+  for (char *p = str; *p != '\0'; p++) {
+    if (isalpha(*p)) {
+      *p = toupper(*p);
+      edits++;
+    }
+  }
+
+  return edits;
+}
+```
+
+### 6. Write a function named `censor` that modifies a string by replacing every occurence of `foo` by `xxx`. For example, the string `"food fool"` would become `"xxxd xxxl"`. Make the function as short as possible without sacrificing clarity.
+
+```C
+int censor(char str[])
+{
+  int edits = 0;
+
+  for (int i = 0; str[i] != '\0'; i++) {
+    if (str[i] == 'f' && str[i + 1] == 'o' && str[i + 2] == 'o') {
+      for (int j = 0; j < 3; j++)  {
+        str[i++] = 'x';
+      }
+      edits++;
+    }
+  }
+
+  return edits;
+}
+```
+
+This actually worked first time with no edits wtf lmao
+
+## 7. Suppose that `str` is an array of characters. Which one of the following statements is not equivalent to the other three?
+
+```C
+a) *str = 0;
+
+b) str[0] = '\0';
+
+c) strcpy(str, "");
+
+d) strcat(str, "");
+```
+
+Statement d will not produce the same result if there are already characters in `str`. The resultant `str` will remain unchanged.
+
+## 8. What will be the value of the string `str` after the following statements have been executed? 
+
+```C
+strcpy(str, "tire-bouchon");    // tire-bouchon
+
+strcpy(&str[4], "d-or-wi");     // tired-or-wi
+
+strcat(str, "red?");            // tired-or-wired?
+```
+
+"tired-or-wired?"
+
+## 9. What will be the value of the string `s1` after the following statements have been executed?
+
+```C
+strcpy(s1, "computer");
+
+strcpy(s2, "science");
+
+if (strcmp(s1, s2) < 0)     
+  strcat(s1, s2);           // computerscience
+
+else
+  strcat(s2, s1);
+
+s1[strlen(s1)-6] = '\0';    // computers
+```
+
+"computers"
+
+## 10. The following function supposedly creates an identical copy of a string. What's wrong with the function?
+
+```C
+char *duplicate(const char *p)
+{
+  char *q;
+
+  strcpy(q, p);
+  return q;
+}
+```
+
+```txt
+warning: 'q' is used uninitialized in this function [-Wuninitialized]
+   strcpy(q, p);
+   ^~~~~~~~~~~~
+```
+
+We've not defined a size for the string that `q` points to, so anything we copy will overflow, I think.
+
+## 11. The Q&A section at the end of this chapter shows how the `strcmp` function might be written using array subscripting. Modify the function to use pointer arithmetic instead.
+
+```C
+int strcmp(char *s, char *t)
+{
+  int i;
+ 
+  for (i = 0; s[i] == t[i]; i++)
+    if (s[i] == '\0')
+      return 0;
+ 
+  return s[i] - t[i];
+}
+```
+
+```C
+int strcmp(char *s, char *t)
+{
+  while (*s++ == *t++)
+    if (*s == '\0')
+      return 0;
+ 
+  return *s - *t;
+}
+```
+
+## 12. Write the following function: `void get_extension(const char *file_name, char *extension);`
+
+- `file_name` points to a string containing a file name.
+- The function should store the extension on the file name in the string pointed to by `extension`. For example, if the file name is `"memo.txt"`, the function will store `"txt"` in the string pointed to by `extension`.
+- If the file name doesn't have an extension, the functions should store an empty string (a single null character) in the string pointed to by `extension`.
+- Keep the function as simple as possible by having it use the `strlen` and `strcpy` functions.
+
+```C
+// index subscripting version
+#include <string.h>
+
+void get_extension(const char *file_name, char *extension)
+{
+  int dot_idx = 0;
+
+  for (int i = strlen(filename); i > 0; i--) {
+    if (file_name[i] == '.') {
+      dot_idx = i;
+      break;
+    }
+  }
+
+  if (dot_idx == 0) {
+    strcpy(extension, "");
+  } else {
+    for (int j = dot_idx + 1, k = 0; j < strlen(file_name); j++) {
+      extension[k++] = file_name[j]
+    }
+  } 
+}
+```
+
+```C
+// pointer arithmetic version
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
+void get_extension(const char *file_name, char *extension)
+{
+  char const *s = file_name;
+  bool copy = false;
+  int i = 0;
+
+  while (*s++) {
+    if (copy)
+        extension[i++] = *s;
+
+    if (*s == '.') {
+        copy = true;
+        strcpy(extension, "");
+        i = 0;
+    }
+  }
+}
+```
+
+## 13. Write the following function: `void build_index_url(const char *domain, char *index_url);`
+
+- `domain` points to a string containing an Internet domain, such as "knking.com".
+- the function should add "http://www." to the beginning of this string and "/index.html" to the end of the string, storing the result in the string pointed to by `index_url`
+- You may assume that `index_irl` points to a variable this is long enough to hold the resulting string.
+- Keep the function as simple as possible by having it use the `strcat` and `strcpy` functions.
+
+```C
+void build_index_url(const char *domain, char *index_url)
+{
+  char *entry = "http://www.",
+       *index = "/index.html";
+
+  strcpy(index_url, entry);
+  strcat(index_url, domain);
+  strcat(index_url, index);
+}
+```
+
+## 14. What does the following program print?
+
+```C
+#include <stdio.h>
+
+int main(void)
+{
+  char s[] = "Hsjodi", *p;
+
+  for (p = s; *p; p++)
+    --*p;
+
+  puts(s);
+
+  return 0;
+}
+```
+
+That's quite clever; it prints "Grinch".
+
+It does so because for every character, it prints the previous ASCII character i.e. 'b' becomes 'a', 'z' becomes 'y'.
+
+## 15. Let `f` be the following function:
+
+```C
+int f(char *s, char *t)
+{
+  char *p1, *p2;
+
+  for (p1 = s; *p1; p1++) {
+    for (p2 = t; *p2; p2++)
+      if (*p1 == *p2) break;
+    if (*p2 == '\0') break;
+  }
+  return p1 - s;
+}
+```
+
+- what is the value of `f("abcd", "babc")`?
+- what is the value of `f("abcd", "bcd")`?
+- In general, what value does `f` return when passed two strings `s` and `t`?
+
+- 0
+- 3
+- the index of the first character in `s` that matches any character in `t`
+
+## 16. Use the techniques of Section 13.6 to condense the `count_spaces` function of Section 13.4. In particular, replace the `for` statement by a `while` loop.
+
+```C
+int count_spaces_condensed(const char *s)
+{
+  int n = 0;
+
+  while (*s++)
+    if (*s == ' ') n++;
+
+  return n;
+}
+```
+
+## 17. Write the following function: `bool test_extension(const char *file_name, const char *extension);`
+
+- `file_name` points to a string containing a file name.
+- the function should return `true` if the file's extension matches the string pointed to by `extension`, ignoring the case of letters.
+- for example, the call `test_extension("memo.txt", "TXT")` should return `true`.
+- incorporate the 'search for the end of a string' idiom into your function.
+- HINT: Use the `toupper` function to convert characters to upper-case before comparison.
+
+```C
+#include <string.h>
+#include <ctype.h>
+
+bool test_extension(const char *file_name, const char *extension)
+{
+  char const *f = file_name;
+  char const *e = extension;
+
+  f += (strlen(file_name) - strlen(extension));
+
+  while(*f)
+    if (toupper(*f++) != toupper(*e++)) 
+      return false;
+  
+  return true;
+}
+```
+
+## 18. Write the following function: `void remove_filename(char *url);`
+
+- `url` points to a string containing a URL (Uniform Resource Locator) that ends with a file name (such as "http://www.knking.com/index.html")
+- the function should modify the string by removing the file-name and the preceding slash (in this example, the result will be "http://www.knking.com")
+- incorporate the "search for the end of a string" idiom into your function. 
+- HINT: have the function replace the last slash in the string by a null character.
+
+```C
+void remove_filename(char *url)
+{
+  char *u = url + strlen(url);
+
+  while (u - url > 0) {
+    if (*u == '/') {
+        *u = '\0';
+        break;
+    }
+    u--;
+  }
+}
+
+void remove_filename_for(char *url)
+{
+  for (char *u = url + strlen(url); u - url > 0; u--)
+    if (*u == '/') { 
+      *u = '\0'; 
+      break; 
+    }
+}
+```
