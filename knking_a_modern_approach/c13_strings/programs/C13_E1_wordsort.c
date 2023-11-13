@@ -32,18 +32,18 @@ void word_sort(char *smallest, char *largest, int word_count)
 
 int main(int argc, char const *argv[])
 {
-    char smallest_word[20] = {0},
-         largest_word[20] = {0};
+    char smallest[20] = {0},
+         largest[20] = {0};
 
     int word_count = 5;
 
     if (argc == 2) 
         word_count = atoi(argv[1]);
 
-    word_sort(smallest_word, largest_word, word_count);
+    word_sort(smallest, largest, word_count);
 
-    printf("Smallest word: %s\n", smallest_word);
-    printf("Largest word: %s\n", largest_word);
+    printf("Smallest word: %s\n", smallest);
+    printf("Largest word: %s\n", largest);
 
     return 0;
 }
