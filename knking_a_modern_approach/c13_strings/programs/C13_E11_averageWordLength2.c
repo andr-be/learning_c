@@ -24,19 +24,19 @@ int main(void)
 
 double compute_average_word_length(const char *sentence)
 {
-    int lettercount = 0,
+    int letters = 0,
         words = 1;
 
-    for (; *sentence; sentence++) 
-    {
-        if (isalpha(*sentence)) lettercount++;
-
-        else if (*sentence == ' ') words++;
+    for (; *sentence; sentence++) {
+        if (isalpha(*sentence)) 
+            letters++;
+        else if (isspace(*sentence))
+            words++;
     }
 
-    double average = (double) lettercount / (double) words;
+    double average = (double) letters / (double) words;
 
-    printf("LETTERS:\t%d\nWORDS:\t\t%d\n", lettercount, words);
+    printf("LETTERS:\t%d\nWORDS:\t\t%d\n", letters, words);
     printf("AVG LENGTH:\t%3.2f LETTERS", average);
 
     return average;
