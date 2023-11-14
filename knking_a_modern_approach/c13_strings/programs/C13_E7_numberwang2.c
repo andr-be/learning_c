@@ -11,8 +11,10 @@
 int get_input(void);
 void print_to_word_s(int input);
 
-int main(void) {
-    while(1){
+int main(void)
+{
+    for(;;)
+    {
         int input = get_input();
         if (input == 0) break;
         printf("You entered the number:  ");
@@ -24,7 +26,8 @@ int main(void) {
 
 /// @brief Asks the user for a two digit number
 /// @return a number entered by the user, modded to between 0 and 100
-int get_input(void){
+int get_input(void)
+{
     int input;
     printf("Enter a two digit number: ");
     scanf("%d", &input);
