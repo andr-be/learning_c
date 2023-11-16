@@ -23,5 +23,7 @@ typedef struct {
 
 bool is_allergic_to(allergen_t allergen, int score);
 allergen_list_t get_allergens(int score);
+allergen_list_t get_blank_list(void);
+void calculate_allergens(allergen_list_t *list, int score);
 
 #endif

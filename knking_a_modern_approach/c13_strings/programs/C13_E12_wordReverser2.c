@@ -48,26 +48,24 @@ void reverse_words(char* buffer)
     int word = 0, 
         character = 0;
 
-    while(*buffer) 
+    for(; *buffer; buffer++) 
     {
-        if(isalpha(*buffer)) 
+        if(isalpha(*buffer)) {
             word_grid[word][character++] = *buffer;
+        }
+
+        else if(isnewline(*buffer) && ispunct(*(buffer - 1))) {
+            terminator = *(buffer - 1);
+        }
 
         else if(isspace(*buffer)) { 
             word_grid[word++][character] = '\0'; 
             character = 0; 
         }
-
-        else if(isnewline(*buffer))
-            if(ispunct(*(buffer - 1)))
-                terminator = *(buffer - 1);
-    
-        buffer++;    
     }
 
-    for (int i = word - 1; i >= 0; i--)
+    for (int i = word; i >= 0; i--) {
         printf("%s ", word_grid[i]);
-
-    putchar('\b');
-    putchar(terminator);
+    }
+    printf("\b%c", terminator);
 }
