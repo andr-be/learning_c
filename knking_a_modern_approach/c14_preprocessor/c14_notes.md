@@ -242,3 +242,53 @@ The empty parameter list isn't really needed, but it makes `getchar` resemble a 
 - ***Macros are "generic".*** Macro parameters, unlike function parameters, have no particular types. As a result, a macro can accept arguments of any type, provided that the resulting program - after preprocessing - is valid. e.g. we could use the MAX macro to find the larger of two values of type `int`, `long`, `float`, `double` and so forth.
 
 There are also some disadvantages:
+
+- ***The compiled code will often be larger***. Each macro invocation causes the insertion of the macro's replacement list, increasing the size of the souce program. This effect is compounded when macro invocations are nested:
+
+```C
+// original source code:
+n = MAX(i, MAX(j, k));
+
+// after pre-processing:
+n = ((i)>(((j)>(k)?(j):(k)))?(i):(((j)>(k)?(j):(k))));
+```
+
+- ***Arguments aren't type-checked.*** When a function is called, the compiler checks each argument to see if it has the appropriate type. If not, either the argument is converted to the proper type or the compiler produces an error message. Macro arguments aren't checked by the preprocessor, nor are they converted.
+
+- ***It's not possible to have a pointer to a macro.*** C allows pointers to functions, a concept that's quite useful in certain situations. Macros are removed during preprocessing, so there's no corresponding notion of "pointer to a macro".
+
+- ***A macro may evaluate its arguments more than once.*** A function evaluates its arguments only once; a macro may evaluate its arguments two or more times. Consider the unexpected behaviour that can result from an argument with side effects:
+
+```C
+// original source code:
+n = MAX(i++, j);
+
+// after pre-processing
+n = ((i++)>(j)?(i++):(j));
+```
+
+In this example, if `i` is larger than `j`, `i` will be incorrectly incremented twice and `n` will be assigned an unexpected value. These bugs are difficult to identify, so care should always be taken not to supply macros arguments that have side effects.
+
+Parameterised macros are good for more than just simulating functions; they're often used as patterns for segments of code that we find ourselves repeating. Suppose we grow tired of writing `printf("%d\n", n)` every time we want to print an integer. We could instead define a macro:
+
+```C
+#define PRINT_INT(n) printf("%d\n", n)
+```
+
+### The # Operator
+
+Macro definitions may contain two special operators, `#`and `##`; neither is recognised by the compiler and is instead handled by the preprocessor.
+
+The `#` operator converts a macro argument into a string literal; it can appear only int he replacement list of a parameterised macro. (The operation performed by `#` is known as "stringization").
+
+Suppose that we decide to use the `PRINT_INT` macro during debugging as a convenient way of printing the values of integer variables and expressions. The `#` operator makes it possible for `PRINT_INT` to label each value that it prints:
+
+```C
+#define PRINT_INT(n) printf(#n " = %d\n", n)
+```
+
+The `#` operator in front of `n` instructs the preprocessor to create a string literal from `PRINT_INT`s argument. Therefore `PRINT_INT(i/j);` will become `printf("i/j = %d\n", i/j);`. When the program is executed, `printf` will display both the expression `i/j` and its value. If `i` is 11 and `j` is 2, the output will be `i/j = 5`.
+
+### The ## Operator
+
+The ## operator can "paste" two tokens (identifers, for example) together to form a single token. 
