@@ -92,7 +92,7 @@ WARNING: The preprocessor has only a limited knowledge of C, it's quite capable 
 
 Most preprocessing directives fall into one of three categories:
 
-- **Macro Definition** - The `#define` directive defines a macro: the `#undef` directive removes a macro definition. 
+- **Macro Definition** - The `#define` directive defines a macro: the `#undef` directive removes a macro definition.
 
 - **File Inclusion** - The `#include` directive causes the contents of a specified file to be included in a program.
 
@@ -178,8 +178,7 @@ Using `#define` to create names for constants has several significant advantages
 
 Although simple macros are most often used to define names for constants, they do have other applications.
 
-- ***Making minor changes to the syntax of C.*** We can, in effect, alter the syntax of C by defining macros that serve as alternate names for C's symbols. e.g. programmers who prefer Pascal's `begin` and `end` to C's `{` and `}` can define the following macros: `#define BEGIN   {` and 
-`#define END     }`. We could go so far as to invent our own language. For example, we might create a `LOOP` statement that establishes an infinite loop: `#define LOOP for (;;)` Changing the syntax of C usually isn't a good idea, since it can make programs harder for others to understand.
+- ***Making minor changes to the syntax of C.*** We can, in effect, alter the syntax of C by defining macros that serve as alternate names for C's symbols. e.g. programmers who prefer Pascal's `begin` and `end` to C's `{` and `}` can define the following macros: `#define BEGIN   {` and `#define END     }`. We could go so far as to invent our own language. For example, we might create a `LOOP` statement that establishes an infinite loop: `#define LOOP for (;;)` Changing the syntax of C usually isn't a good idea, since it can make programs harder for others to understand.
 
 - ***Renaming types.*** In section 5.2, we created a Boolean type by renaming `int`: `#define BOOL int`. Although some programmers use macros for this purpose, type definitions are a superior way to define type names.
 
@@ -220,8 +219,7 @@ i = ((j+k)>(m-n)?(j+k):(m-n));
 if (((i)%2==0)) i++;
 ```
 
-As this example shows, parameterised macros often serve as simple functions. MAX behaves like a function that computes the larger of two values. IS_EVEN behaves like a function that returns 1 if its argument is an even number and 0 otherwise. 
-
+As this example shows, parameterised macros often serve as simple functions. MAX behaves like a function that computes the larger of two values. IS_EVEN behaves like a function that returns 1 if its argument is an even number and 0 otherwise.
 
 ```C
 #define TOUPPER(c) ('a'<=(c)&&(C)<='z'?(c)-'a'+'A':(c))
@@ -445,4 +443,169 @@ ECHO(str);
 ```
 
 ### Predefined Macros
+
+C has several predefined macros; each one represents an integer constant or string literal.
+
+| NAME       | DESCRIPTION                                              |
+| ---------- | -------------------------------------------------------- |
+| `__LINE__` | Line number of file being compiled.                      |
+| `__FILE__` | Name of file being compiled.                             |
+| `__DATE__` | Date of compilation (Mmm dd yyyy)                        |
+| `__TIME__` | Time of compilation (hh:mm:ss)                           |
+| `__STDC__` | 1 if the compiler conforms to the C standard (C89 / C99) |
+
+The `__DATE__` and `__TIME__` macros identify when a proram was compiled, this can be useful for distinguishing among different versions of the same program.
+
+```C
+printf("Wacky Windows (c) 2010 Wacky Software, Inc.\n");
+printf("Compiled on %s at %s\n", __DATE__, __TIME__);
+
+// each time it begins, the program will print:
+Wacky Windows (c) 2010 Wacky Software, Inc.
+Compiled on Dec 23 2010 at 22:18:48
+```
+
+We can use the `__LINE__` and `__FILE__` macros to help locate errors, such as a macro that can detect where divide-by-zero errors appear:
+
+```C
+#define CHECK_ZERO(divisor)                                 \
+    if (divisor == 0)                                       \
+        printf("*** Attempt to divide by zero on line %d "  \
+               "of file %s ***\n", __LINE__, __FILE__)
+// ...
+CHECK_ZERO(j);
+k = i / j;
+```
+
+If `j` happens to be zero, a message of the following form will be printed: `*** Attempt to divide by zero on line 9 of file foo.c ***`
+
+Error detecting macros like this one can be quite useful. The C library has a general-purpose error-detecting macro named `assert`.
+
+The `__STDC__` macro exists and has the value `1` if the compiler conforms to the C standard (either C89 or C99). By having the preprocessor test this macro, a program can adapt to a compiler that predates the C89 standard.
+
+### Additional Predefined Macros in C99
+
+| NAME                       | DESCRIPTION                                                   |
+| :------------------------- | ------------------------------------------------------------- |
+| `__STDC_HOSTED__`          | 1 if this is a hosted implementation; 0 if it is freestanding |
+| `__STDC_VERSION__`         | Version of C standard supported                               |
+| `__STDC_IEC_559__`✝        | 1 if IEC 60559 floating-point arithmetic is supported         |
+| `__STDC_IEC_559_COMPLEX__`✝| 1 if IEC 60559 complex arithmetic is supported                |
+| `__STDC_ISO_10646__`✝      | yyyymmL if wchar_t values match the ISO 10646 standard of the specified year and month |
+
+✝ *Conditionally defined*
+
+To understand the meaning of `__STDC__HOSTED__` we need some new vocabulary; an *implementation* of C consists of the compiler plus other software necessary to execute C programs. C99 divides implementations into two categories; hosted & freestanding.
+
+- A ***hosted implementation*** must accept any program that conforms to the C99 standard.
+- A ***freestanding implementation*** doesn't have to compile programs that use complex types or standard headers beyond a few of the most basic. (In particular, a freestanding implementation doesn't have to support the `<stdio.h>` header)
+
+The `__STDC_HOSTED__` macro represents the constant 1 if the compiler is a hosted implementation, otherwise the macro has the value 0.
+
+The `__STDC_VERSION__` macro provides a way to check which version of the C standard is recognised by the compiler; it first appeared in Amendment 1 to the C89 standard, where its value was specified to be the long integer constant `199409L` representing the year and month of the amendment. If a compiler conforms to the C99 standard, the value is `199901L`. For each subsequent version and amendment to the standard, the macro will have a different value.
+
+A C99 compiler may or may not define three additional macros; each macro is defined only if the compiler meets a certain requirement:
+
+- `__STDC_IEC_559__` is defined (and has the value 1) if the compiler performs floating-point arithmetic according to the IEC 60559 standard (also known as the IEEE 754 standard).
+- `__STDC_IEC_559_COMPLEX__` is defined (and has the value 1) if the compiler performs complex arithmetic according to the IEC 60559 standard.
+- `__STDC_ISO_10646__` is defined as an integer constant of the form `yyyymmL` (e.g. `199712L`) if the values of type `wchar_t` are represented by the codes in the ISO/IEC 10646 standard (with revisions as of the specified year and month).
+
+### Empty Macro Arguments
+
+C99 allows any or all of the arguments in a macro call to be empty. In most cases, the effect of an empty argument is clear; wherever the corresponding parameter name appears in the replacement list, it's replaced by nothing - it simply disappears from the list:
+
+```C
+#define ADD(x,y) ((x) + (y))
+// after preprocessing:
+i = ADD(j, k);
+// becomes:
+i = ((j) + (k));
+// whereas the statement 
+i = ADD(,k);
+// becomes
+i = (+(k));
+```
+
+When an empty argument is an operand of the `#` or `##` operators, special rules apply. If an empty argument is "stringized" by the `#` operator, the result is "" (the empty string):
+
+```C
+#define MK_STR(x) #x
+...
+char empty_string[] = MK_STR();
+// this becomes:
+char empty_string[] = "";
+```
+
+If one of the arguments of the `##` operator is empty, it's replaced by an invisible "placemarker" token. Concatenating an ordinary token with a placemarker token yields the original token (the placemarker disappears).
+
+If two placemarker tokens are concatenated, the result is a single placemarker. Once macro expansion has been completed, placemarker tokens disappear from the program. Consider the following example:
+
+```C
+#define JOIN(x, y, z) x##y##z
+...
+int join(a,b,c), JOIN(a,b,), JOIN(a,,c), JOIN(,,c);
+// After preprocessing, the declaration will have the following appearance:
+int abc, ab, ac, c;
+```
+
+The missing arguments were replaced by placemarker tokens, which then disappear when concatenated with any nonempty arguments. All three arguments to the `JOIN` macro could even be missing, which would yield and empty result.
+
+### Macros with a Variable Number of Arguments
+
+In C89, a macro must have a fixed number of arguments, if it has any at all. C99 loosens up the requirements, allowing macros that take an unliminted number of arguments, just like functions. The primary reason for having a macro with a variable number of arguments is that it can pass these arguments to a function that accepts a variable number of arguments, such as `printf` or `scanf`:
+
+```C
+#define TEST(condition, ...) ((condition)?  \
+  printf("Passed test: %s\n", #condition):  \
+  printf(__VA_ARGS__))
+```
+
+The `...` token, known as ***ellipsis***, goes at the end of a macro's parameter list, preceded by ordinary parameters, if there are any. `__VA_ARGS__` is a special identifier that can only appear in the replacement list of a macro with a variable number of arguments; it represents all the arguments that corresponds to the ellipsis. The `TEST` macro requires at least two arguments, the first argument matches the `condition` parameter; the remaining arguments match the ellipsis.
+
+```C
+TEST(voltage <= max_voltage,
+    "Voltage %d exceeds %d\n", voltage, max_voltage);
+```
+
+The preprocessor will produce the following output (reformatted for readability)
+
+```C
+((voltage <= max_voltage)?
+  printf("Passed test: %s\n", "voltage <= max_voltage"):
+  printf("Voltage %d exceeds %d\n", voltage, max_voltage));
+```
+
+When the program is executed, it will display the message: `Passed test: voltage <= max_voltage` if voltage is no more than `max_voltage`. Otherwise, it will display the values of `voltage` and `max_voltage`: `Voltage 125 exceeds 120`.
+
+### The `__func__` Identifier
+
+Another new feature of C99 is the `__func__` identifier. `__func__` has nothing to do with the preprocessor, so it doesn't really belong in this chapter. However, it's useful for debugging, so we'll include it here.
+
+Every function has access to the `__func__` identifier, which behaves like a string variable that stores the name of the currently executing function. The effect is the same as if each function contains the following declaration at the beginning of its body:
+
+```C
+static const char __func__[] = "function-name";
+```
+
+Where function-name is the name of the function. The existence of this identifier makes it possible to write debugging macros:
+
+```C
+#define FUNCTION_CALLED() printf("%s called\n", __func__);
+#define FUNCTION_RETURNS() printf("%s returns\n", __func__);
+```
+
+Calls of these macros can then be placed inside functions to trace their calls.
+
+```C
+void f(void)
+{
+    FUNCTION_CALLED();      // displays "f called"
+    ...
+    FUNCTION_RETURNS();     // displays "f returns"
+}
+```
+
+Another `__func__`: it can be passed to a function to let it know the name of the function that called it.
+
+## 14.4 Conditional Compilation
 
