@@ -92,7 +92,7 @@ WARNING: The preprocessor has only a limited knowledge of C, it's quite capable 
 
 Most preprocessing directives fall into one of three categories:
 
-- **Macro Definition** - The `#define` directive defines a macro: the `#undef` directive removes a macro definition.
+- **Macro Definition** - The `#define` directive defines a macro: the `#undef` directive removes a macro definition. 
 
 - **File Inclusion** - The `#include` directive causes the contents of a specified file to be included in a program.
 
@@ -178,7 +178,8 @@ Using `#define` to create names for constants has several significant advantages
 
 Although simple macros are most often used to define names for constants, they do have other applications.
 
-- ***Making minor changes to the syntax of C.*** We can, in effect, alter the syntax of C by defining macros that serve as alternate names for C's symbols. e.g. programmers who prefer Pascal's `begin` and `end` to C's `{` and `}` can define the following macros: `#define BEGIN   {` and `#define END     }`. We could go so far as to invent our own language. For example, we might create a `LOOP` statement that establishes an infinite loop: `#define LOOP for (;;)` Changing the syntax of C usually isn't a good idea, since it can make programs harder for others to understand.
+- ***Making minor changes to the syntax of C.*** We can, in effect, alter the syntax of C by defining macros that serve as alternate names for C's symbols. e.g. programmers who prefer Pascal's `begin` and `end` to C's `{` and `}` can define the following macros: `#define BEGIN   {` and 
+`#define END     }`. We could go so far as to invent our own language. For example, we might create a `LOOP` statement that establishes an infinite loop: `#define LOOP for (;;)` Changing the syntax of C usually isn't a good idea, since it can make programs harder for others to understand.
 
 - ***Renaming types.*** In section 5.2, we created a Boolean type by renaming `int`: `#define BOOL int`. Although some programmers use macros for this purpose, type definitions are a superior way to define type names.
 
@@ -219,7 +220,8 @@ i = ((j+k)>(m-n)?(j+k):(m-n));
 if (((i)%2==0)) i++;
 ```
 
-As this example shows, parameterised macros often serve as simple functions. MAX behaves like a function that computes the larger of two values. IS_EVEN behaves like a function that returns 1 if its argument is an even number and 0 otherwise.
+As this example shows, parameterised macros often serve as simple functions. MAX behaves like a function that computes the larger of two values. IS_EVEN behaves like a function that returns 1 if its argument is an even number and 0 otherwise. 
+
 
 ```C
 #define TOUPPER(c) ('a'<=(c)&&(C)<='z'?(c)-'a'+'A':(c))
@@ -608,4 +610,137 @@ void f(void)
 Another `__func__`: it can be passed to a function to let it know the name of the function that called it.
 
 ## 14.4 Conditional Compilation
+
+The C preprocessor recognises a number of directives that support ***conditional compilation*** - the inclusion or exclusion of a section of program text depending on the outcome of a test performed by the preprocessor.
+
+### The `#if` and `#endif` Directives
+
+Suppose we're debugging a program; we'd like the program to print the values of certain variables, so we put calls of `printf` in critical parts of the program. Once we've located the bugs, it's not a bad idea to leave the `printf`'s in place in case we need them later. Conditional compilation allows us to leave the calls in place, but have the compiler ignore them.
+
+First, we'll define a macro and give it a nonzero value. The name of the macro doesn't matter. We'll surround each group of `printf` calls by an `#if-#endif` pair:
+
+```C
+#if DEBUG
+printf("Value of i: %d\n", i);
+printf("Value of j: %d\n", j);
+#endif
+```
+
+During preprocessing, the `#if` directive will test the value of `DEBUG`. Since its value isn't zero, the preprocessor will leave the two calls of `printf` in the program. If we change the value of `DEBUG` to zero and recompile the program, the `printf` calls will not be included and therefore will not call, or take up any processing time.
+
+When the processor encounters the `#if` directive, it evaluates the constant expression. If it isn't zero, the lines between `#if` and `#endif` will be removed from the program before it's compiled. The `#if` directive directive treats undefined identifiers as macros that have the value 0, so if we don't define `DEBUG` the test will fail (but not generate an error message); `#if !DEBUG` will succeed.
+
+### The `defined` Operator
+
+We encountered the # and ## operators in Section 14.3. There's one more operator: `defined` that's specific to the preprocessor. When applied to an identifier, `defined` produces the value `1` if the identifier is a currently defined macro; it produces 0 otherwise. The `defined` operator is normally used in conjunction with the `#if` directive:
+
+```C
+#if defined(DEBUG)
+...
+#endif
+```
+
+The lines between the `#if` and `#endif` directives will be included in the program only if `DEBUF` is defined as a macro. The parentheses around `DEBUG` aren't required; we could simply write
+
+```C
+#if defined DEBUG
+```
+
+Since `defined` tests only whether `DEBUG` is defined or not, it's not necessary to give `DEBUG` a value:
+
+```C
+#define DEBUG
+```
+
+### The `#ifdef` and `#ifndef` Directives
+
+`#ifdef` tests whether an identifer is currently defined as a macro. It's similar to `#if`:
+
+```C
+#ifdef  identifier
+Lines to be included if identifier is defined as a macro
+#endif
+```
+
+`#ifdef` is equivalent to `#if defined(identifier)`. `#ifndef` is similar to `#ifdef`, but tests whether an identifier is not defined as a macro. `#ifndef  identifier` is the same as writing `#if !defined(identifier)`.
+
+### The `#elif` and `#else` Directives
+
+`#if`, `#ifdef`, and `#ifndef` blocks can be nested just like ordinary `if` statements. When nesting occurs, it's a good idea to use an increasing amount of identation as the level of nesting grows; it can be useful to put a comment on each closing `#endif` to indicate what condition the matching `#if` tests:
+
+```C
+#if DEBUG
+...
+#endif // DEBUG
+```
+
+For additional convenience, the preprocessor supports the `#elif` and `#else` directives. They can be used in condjunction with `#if`, `#ifdef`, and `#ifndef` to test a series of conditions:
+
+```C
+#if expr1
+... // included if expr1 is nonzero
+#elif expr2
+... // included if expr1 is zero but expr2 is nonzero
+#else
+... // included otherwise
+#endif // expr1, expr2
+```
+
+```C
+#ifdef DEBUG
+... // included if DEBUG is nonzero
+#elif defined ULTRA_DEBUG
+... // included if DEBUG is 0 and ULTRA_DEBUG is 1
+#else
+... // included otherwise
+#endif // DEBUG, ULTRA_DEBUG
+```
+
+### Uses of Conditional Compilation
+
+Conditional compilation is handy for debugging, but there are other useful applications:
+
+- ***Writing programs that are portable to several machines or operating systems.*** The following example includes one of three groups of lines depending on whether WIN32, MAC_OS or LINUX is defined as a macro:
+
+```C
+#if defined(WIN32)
+...
+#elif defined(MAC_OS)
+...
+#elif defined(LINUX)
+...
+#endif // WIN32, MAC_OS, LINUX
+```
+
+A program might contain many of these `#if` blocks. At the beginning of a program one of the macros will be defined, thereby selecting a particular operating system. For example, defining the `LINUX` macro might indicate that the program should be run on the Linux operating system.
+
+- ***Writing programs that can be compiled with different compilers.*** Different compilers often recognise somewhat different versions of C. Conditional compilation allows a program to adjust to different compilers, that may have machine specific language extensions or demand a standard version. The `__STDC__` macro allows the preprocessor to detect whether a compiler conforms to a standard; if it doesn't, we may need to change certain aspects of the program; such as old-style function declarations instead of function prototypes. 
+
+```C
+#if __STDC__
+... // function prototypes
+#else
+... // old style function declarations
+#endif
+```
+
+- ***Providing a default definition for a macro.*** Conditional compilation allows us to check whether a macro is current defined and if not give it a default definition.
+
+```C
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 256
+#endif // BUFFER_SIZE
+```
+
+- ***Temporarily disabling code that contains comments.***  We can't use `/*...*/` to comment out code that already contains comments of that style. Instead, we can use the `#if` directive:
+
+```C
+#if 0
+... // lines containing comments
+#endif
+```
+
+Disabling code in this way is often called "conditioning out". There is another common application: protecting header files against multiple inclusion; this will be discussed in the next chapter.
+
+## 14.5 Miscellaneous Directives
 
