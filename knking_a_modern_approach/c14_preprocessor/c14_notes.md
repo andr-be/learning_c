@@ -291,4 +291,158 @@ The `#` operator in front of `n` instructs the preprocessor to create a string l
 
 ### The ## Operator
 
-The ## operator can "paste" two tokens (identifers, for example) together to form a single token. 
+The ## operator can "paste" two tokens (identifers, for example) together to form a single token. There aren't many good ways to use this operator, but one example is in the form of generic functions.
+
+Suppose we wanted to write a `MAX` function for different types of integers and floats, but we didn't want to write multiple identical functions. We could instead write a macro that expands into the definition of a max function.
+
+Unfortunately, if we tried to naively create one, we would have an issue that both functions would be called the same thing, which isn't allowed in C. Instead, we'll use the ## operator to crate a different name for each version of max:
+
+```C
+#define GENERIC_MAX(type)       \
+type type##_max(type x, type y) \
+{                               \
+    return x > y ? x : y;       \
+}
+```
+
+Notice how `type` is joined with `_max` to form the name of the function. Suppose that we hapen to need a max function that works with `float` values;
+
+```C
+GENERIC_MAX(float)
+
+// the preprocessor expands this line into the following
+
+float float_max(float x, float y) { return x > y ? x : y; }
+```
+
+### General Properties of Macros
+
+- ***A macro's replacement list may contain invocations of other macros.*** For example, we could define the macro `TWO_PI` in terms of another macro called `PI`:
+
+```C
+#define PI          3.14159
+#define TWO_PI      (2 * PI)
+#define PI_OVER_2   (PI / 2)
+```
+
+When it encounters `TWO_PI` later in the program, the preprocessor replaces it by `(2 * PI)`. It then rescans the replacement list to see if it contains invocations of other macros, and will rescan the replacement list as many time as necessary to eliminate all macro names.
+
+- ***The preprocessor replaces only entire tokens, not portions of tokens.*** As a result, the preprocessor ignores macro names that are embedded in identifiers, character constants and string literals:
+
+```C
+#define SIZE 256
+
+int BUFFER_SIZE;
+
+if (BUFFER_SIZE > SIZE)
+    puts("Error: SIZE exceeded!");
+
+// after preprocessing, this will look like:
+
+int BUFFER_SIZE;
+
+if (BUFFER_SIZE > 256)
+    puts("Error: SIZE exceeded!");
+```
+
+The identifier `BUFFER_SIZE` and the string `"Error: SIZE exceeded"` weren't affected by preprocessing, even though both contain the word SIZE.
+
+- ***A macro definition normally remains in effect until the end of the file in which it appears.*** Since macros are handled by the preprocessor, they don't obey normal scope rules. A macro defined inside the body of a function isn't local to that function' it remains defined until the end of the file.
+
+- ***A macro may not be defined twice unless the new definition is identical to the old one.*** Differences in spacing are allowed, but the tokens in the macro's replacement list (and the parameters) must be the same.
+
+- ***Macros may be "undefined" by the `#undef` directive.*** It is used in the form:
+
+```C
+#define N 50
+#undef N        // removes the current definition of the macro N.
+```
+
+One use of `#undef` is to remove the existing definition of a macro so that it can be given a new definition.
+
+### Parentheses in Macro Definitions
+
+Is it necessary to have so many parentheses in our macro definitions? The answer is an emphatic **"YES"**; if we use fewer brackets the macros will sometimes give unexpected and undesirable results. There are two rules to follow when deciding:
+
+1. If the macro's replacement list contains an operator, always enclose the replacement list in parentheses.
+
+2. If the macro has parameters, put parentheses around each parameter every time it appears in the replacement list.
+
+```C
+#define TWO_PI 2 * 3.14159
+// needs parentheses around the replacement list!
+
+conversion_factor = 360 / TWO_PI;
+// becomes
+conversion_factor = 360 / 2 * 3.14159;
+// == 180 * 3.14159 (565.49) and not 360 / 6.28318 (57.30)
+```
+
+Failing to adhere to these rules can lead to situations like the above, where the order of operations C adheres to means that the division will happen before the multiplication, causing us to calculate the wrong value for the conversion factor.
+
+Putting parentheses around the replacement list isn't enough if the macro has parameters: each occurrence of a parameter needs parentheses as well. For example:
+
+```C
+#define SCALE(x) (x * 10)   
+// needs parens around x!
+j = SCALE(i + 1);
+// becomes
+j = (i + 1 * 10)
+// multiplication takes precedence over addition:
+j = i + 10
+// this should be (i + 1) * 10!
+```
+
+> A shortage of parentheses in a macro definition can cause some of C's most frustrating errors. The program will usually compile and the macro will appear to work, failing only at the least convenient times.
+
+### Creating Longer Macros
+
+The comma operator can allow us to create moresophisticated macros by allowing us to make the replacement list a series of expressions:
+
+```C
+#define ECHO(s) (gets(s), puts(s))
+
+ECHO(str); // becomes: (gets(str), puts(str));
+```
+
+Instead of using the comma operator, we could have enclosed the calls in braces to form a compound statement; unfortunately this method doesn't work as well.
+
+```C
+#define ECHO(s) { gets(s); puts(s); }
+
+if (echo_flag)
+    ECHO(str);
+else
+    gets(str);
+
+// replacing ECHO gets us the following:
+if (echo_flag)
+    { gets(str); puts(str); };
+else
+    gets(str);
+```
+
+The compiler treats the first two lines as a complete `if` statement. It treats the semicolon that follows as a null statement and produces an error message for the `else` clause, since it doesn't belong to any `if`.
+
+The comma operator solves this problem for `ECHO`, but not for all macros. Suppose that a macro needs to contain a number of *statements*, not just a series of *expressions*. The comma operator is of no help; it can glue together expressions but not statements. The solution is to wrap the statements in a `do` loop whose condition is false:
+
+```C
+do { ... } while (0)
+// will only execute once!
+
+#define ECHO(s)         \
+        do {            \
+            gets(s);    \
+            puts(s);    \
+        } while (0) 
+```
+
+When `ECHO` is used, it must be followed by a semicolon, which completes the `do` statement.
+
+```C
+ECHO(str);
+// becomes: do { gets(str); puts(str); } while (0);
+```
+
+### Predefined Macros
+
