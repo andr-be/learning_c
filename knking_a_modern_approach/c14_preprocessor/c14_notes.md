@@ -744,3 +744,126 @@ Disabling code in this way is often called "conditioning out". There is another 
 
 ## 14.5 Miscellaneous Directives
 
+To finish up, we'll look at the `#error`, `#line` and `#pragma` directives. These are much more specialised than the ones we've already looked at, and they're used much less frequently.
+
+### The `#error` Directive
+
+```C
+#error  message
+```
+
+If the preprocessor encounters and `#error` directive, it prints an error message which must include `message`. The exact form of the error message can vary from one compiler to another; it might be something like:
+
+```C
+Error directive: message
+// or perhaps just
+#error message
+```
+
+Encountering an `#error` directive indicates a serious flaw in the program; some compilers immediately terminate compilation without attempting to find other errors. They're often used in conjunction with conditional compilation to check for situations that shouldn't arise during a normal compilation.
+
+For example, suppose that we want to ensure that a program can't be compiled on a machine whose `int` type isn't capable of storing numbers up to 100,000. The largest possible `int` value is represented by the `INT_MAX` macro, so all we need to do is invoke an `#error` directive if `INT_MAX` isn't at least 100,000:
+
+```C
+#if INT_MAX < 100000
+#error int type is too small
+#endif
+
+// Error directive: int type is too small
+```
+
+The `#error` directive is often found in the `#else` part of an `#if-#elif-#else` series: 
+
+```C
+#if defined(WIN32)
+...
+#elif defined(MAC_OS)
+...
+#elif defined(LINUX)
+...
+#else
+#error No operating system specified
+#endif
+```
+
+### The `#line` Directive
+
+The `#line` diretive is used to alter the way program lines are numbered. We can use this directive to make the compiler think that it's reading the program from a fil with a different name.
+
+The `#line` directive has two forms:
+
+```C
+#line n
+```
+
+In this form we specify a line number. `n` must be a sequence of digits representing an integer between 1 and 32767 (214783647 in C99). This directive causes subsequent lines in the program to be numbered `n`, `n + 1`, `n + 2`, etc.
+
+```C
+#line n "file"
+```
+
+In this form, both a line number and a file name are specified. The lines that follow this directive are assumed to come from `file`, with line numbers starting at `n`. The values of `n` and/or the `file` string can be specified using macros.
+
+One effect of the `#line` directive is to change the value of the `__LINE__` macro (and possibly the `__FILE__` macro). Compilers will use the information from the `#line` directive when generating error messages.
+
+At first glance, the `#line` directive is mystifying. Why would we ever want error messages to refer to a different line and possibly a different file? Wouldn't this make programs hader to debug?
+
+In fact, the `#line` directive isn't used very often by programmers; instead it's primarily used by programs that generate C code as output. One of the more famous examples of such a program is `yacc` (Yet Another Compiler-Compiler), a UNIX utility that automatically generates parts of a compiler.
+
+Before using `yacc`, the user generates a C program, `y.tab.c` that incorporates the code supplied by the programmer. The programmer then compiles `y.tab.c` in the usual way. By inserting `#line` directives in `y.tab.c`, `yacc` tricks the compiler into believing that the code comes from the original file - the one written by the programmer.
+
+This means that any error messages produced during the compilation of `y.tab.c` will reger to lines in the original file, not lines in the generated `y.tab.c`. This makes debugging significantly easier.
+
+### The `#pragma` Directive
+
+`#pragma` provides a way to request special behaiour from the compiler. This directive is most useful for programs that are unusually large or need to take advantage of the capabilities of a particular compiler.
+
+```C
+// example pragma directive
+#pragma data(heap_size => 1000, stack_size => 2000)
+```
+
+Unsurprisingly, the set of commands that can appear in `#pragma` directives is different for each compiler; consult the documentation for your compiler to see what commands it allows. The processor must ignore an `#pragma` directive that contains an unrecognized command and is not permitted to give an error message.
+
+In C89 there are no standard pragmas - they're all implementation specific. C99 has three standard pragmas, all of which use STDC as their first token following `#pragma`.
+
+- `FP_CONTRACT`
+- `CX_LIMITED_RANGE`
+- `FENV_ACCESS`
+
+### The `_Pragma` Operator
+
+C99 introduced the `_Pragma` operator, which is used in conjunction with the `#pragma` directive. A `_Pragma` expression has the form:
+
+```C
+_Pragma  ( string-literal )
+```
+
+When it encounters such an expression, the preprocessor "destringizes" the string literal by removing the double quotes around the string and replacing the escape sequences `\"` and `\\` by the characters `"` and `\` respectively. The result is a series of token, which are then treated as though they appear in a `#pragma` directive:
+
+```C
+_Pragma("data(heap_size) => 1000, stack_size => 2000)")
+
+// is the same as writing
+
+#pragma data(heap_size => 1000, stack_size => 2000) 
+```
+
+The `_Pragma` operator lets us work around a limitation of the preprocessor: the fact that a preprocessing directive can't generate another directive. `_Pragma` is an operator, not a directive, and can therefore appear in a macro definition, making it possible for a macro expansion to leave behind a `#pragma` directive.
+
+We'll look at an example from the GCC manual:
+
+```C
+#define DO_PRAGMA(x) _Pragma(#x)
+
+// invoked as:
+
+DO_PRAGMA(GCC dependency "parse.y")
+
+// after expansion
+
+#pragma GCC dependency "parse.y"
+```
+
+
+
