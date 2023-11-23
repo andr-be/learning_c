@@ -865,5 +865,64 @@ DO_PRAGMA(GCC dependency "parse.y")
 #pragma GCC dependency "parse.y"
 ```
 
+Note that the argument to the call of `DO_PRAGMA` is a series of tokens; the # operator in the definition of `DO_PRAGMA` causes the tokes to be stringized into `"GCC dependency \"parse.y\""`; this string is then passed to the `_Pragma` operator, which destringizes it, producing a `#pragma` directive containing the original tokens.
 
+## Chapter 14 - Q&A
 
+**Q. I've seen programs that contain a # on a line by itself. Is this legal?**
+
+A. Yes; this is the ***null directive***; it has no effect. Some programmers use them to properly space conditional compilatioan blocks:
+
+```C
+#if INT_MAX < 100000
+#
+#error int type is too small
+#
+#endif
+```
+
+***
+
+**Q. I'm not sure which constants in a program need to be defined as macros. Are there are useful guidelines to follow?**
+
+A. One rule of thumb says every numeric sonstant other than 0 or 1 should be a macro. Character and string constants are problematic, since replacing a character or string constant by a macro doesn't always improve readability. The book recommends using a amcro instead of a character constant or string literal provided that:
+
+1) The constant is used more than once
+2) The possibility exists that the constant might someday be modified.
+
+Rule 2) means that macros such as `#define NUL '\0'` aren't ideal, but some people still use them.
+
+***
+
+**Q. What does the # operator do if the argument that it's supposed to "stringize" constains a " or \ character?**
+
+A. It converts `"` to `\"` and `\` to `\\`:
+
+```C
+#define STRINGIZE(x) #x
+// replaces STRINGIZE("foo") with "\"foo\""
+```
+
+***
+
+***Q. I can't get the following macro to work properly: `#define CONCAT(x,y) x##y`. `CONCAT(a,b)` gives `ab` as expected, but `CONCAT(a,CONCAT(b,c))` gives an odd result. What's going on?***
+
+A. Thanks to rules that K&R call 'bizarre', macros whose replacement lists depend on ## usually can't be called in a nested fashion because they're not expanded in a "normal" fashion at the time of substition. As a result, `CONCAT(a,CONCAT(b,c))` expands to `aCONCAT(b,c)`, which can't be expanded further since there's no macro named `aCONCAT`. There's a way to solve this problem, but it's shit:
+
+```C
+#define CONCAT2(x,y) CONCAT(x,y)
+```
+
+Writing `CONCAT2(a,CONCAT2(b,c))` now yields the desired result. As the preprocessor expands the outer call of `CONCAT2`, it will expand `CONCAT2(b,c)` as well, the difference is that `CONCAT2`'s replacement list doesn't contain `##`.
+
+If none of this makes sense, (it doesn't) don't worry because it'll never come up if you're not insane.
+
+***
+
+***Q. What's the purpose of distinguishing between a "hosted implementation" and a "freestanding implementation"? If a freestanding implementation doesn't even support the `<stdio.h>` header, what use is it?***
+
+A. A hosted implementation is needed for most programs, which relies on the underlying operating system for input/output and other essential services.
+
+A freestanding implementation of C would be used for programs that require no, or a very minimal, operating system. This would be required for writing the kernel of an operating system, or for embedded systems.
+
+***
