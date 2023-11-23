@@ -109,10 +109,10 @@ There are a few rules that apply to all directives:
 - ***Directives always end at the first new-line character, unless explicitly continued.*** To continue a directive to the next line, we must end the current line with a \ character. For example, the following directive defines a macro that represents the capacity of a hard disk:
 
 ```C
-#define DISK_CAPACITY (SIDES *              \
-                       TRACKS_PER_SIDE *    \
-                       SECTORS_PER_TRACK *  \
-                       BYTES_PER_SECTOR)
+#define DISK_CAPACITY(SIDES *              \
+                      TRACKS_PER_SIDE *    \
+                      SECTORS_PER_TRACK *  \
+                      BYTES_PER_SECTOR)
 ```
 
 - ***Directives can appear anywhere in a program.*** Although we usually put `#define` and `#include` directives at the beginning of a file, other directives are more likely to show up later, even in the middle of function definitions.
@@ -926,3 +926,432 @@ A. A hosted implementation is needed for most programs, which relies on the unde
 A freestanding implementation of C would be used for programs that require no, or a very minimal, operating system. This would be required for writing the kernel of an operating system, or for embedded systems.
 
 ***
+
+## Written Exercises
+
+### 1
+
+Write parameterised macros that compute the following values
+
+a) The cube of `x`.
+
+b) The remainder when `n` is divided by 4.
+
+b) 1 if the product of `x` and `y` is less than 100, 0 otherwise.
+
+```C
+#define CUBE( x )                ( (x) * (x) * (x) )
+#define DIV4_MOD( n )            ( (n) % (4) )
+#define PRODUCT_SUB_100( x, y )  ( (x * y < 100) ? 1 : 0 )
+```
+
+***
+
+### 2
+
+Write a macro `NELEMS(a)` that computes the number of elements in a one-dimensional array `a`
+
+Hint: See the discussion of the `sizeof` operator in **Section 8.1**.
+
+```C
+#define NELEMS( a )     ( sizeof(a) / sizeof(*a) )
+```
+
+***
+
+### 3
+
+Let `DOUBLE` be the following macro: `#define DOUBLE(x)  2*x`
+
+a) What is the value of `DOUBLE(1+2)`?
+
+b) What is the value of `4/DOUBLE(2)`?
+
+c) Fix the defition of `DOUBLE`.
+
+```C
+/* a */     DOUBLE(1+2) == 2*1+2*2 
+                        == 6
+
+/* b */     4/DOUBLE(2) == 4/2*2 
+                        == 4
+
+/* c */     #define DOUBLE(x) ( 2 * (x) )                        
+```
+
+***
+
+### 4
+
+For each of the following macros, give an example that illustrates a problem with the macro and show how to fix it
+
+a) `#define AVG(x,y)   (x-y)/2`
+
+b) `#define AREA(x,y)  (x)*(y)`
+
+```C
+/* a */     AVG(1 - 2, 3 + 4) == (1 - 2-3 + 4)/2
+                              == (0) / 2 
+                              == 0
+
+            #define AVG(x,y)    ( ((x) + (y)) / 2 )
+
+/* b */     AREA(-3, 10)    ==  (-3)*(10)
+                            ==  -30
+
+// there's nothing wrong with this macro..?
+```
+
+***
+
+### 5
+
+Let TOUPPER be the following macro 
+
+```C
+#define TOUPPER(c) ('a'<=(c)&&(c)<='z'?(c)-'a'+'A':(c))
+```
+
+Let `s` be a string and let `i` be an `int` variable. Show the output produced by each of the following program fragments:
+
+```C
+a)  strcpy(s, "abcd");
+    i = 0;
+    putchar(TOUPPER(s[++i]));
+
+b)  strcpy(s, "0123");
+    i = 0;
+    putchar(TOUPPER(s[++i]));
+```
+
+a) `BCD`
+
+b) `123`
+
+***
+
+### 6
+
+Write a macro `DISP(f,x)` that expands into a call of `printf` that displays the value of the function `f` when called with argument `x`. For example
+
+```C
+DISP(sqrt, 3.0);    // should expand into:
+
+printf("sqrt(%g) = %g\n", 3.0, sqrt(3.0));
+```
+
+b) Write a macro `DISP2(f,x,y)` that's similar to `DISP` but works for functions with two arguments.
+
+```C
+#define DISP( f, x )     printf(#f "(%g) = %g\n", x, f(x))
+#define DISP2( f, x, y ) printf(#f "(%g, %g) = %g\n", x, y, f(x,y))
+
+double add_together(double x, double y)
+{
+    return x + y;
+}
+
+double times_ten(double x)
+{
+    return 10 * x;
+}
+```
+
+```txt
+times_ten(16) = 160
+add_together(2, 3) = 5
+```
+
+***
+
+### 7
+
+Let `GENERIC_MAX` be the following macro:
+
+```C
+#define GENERIC_MAX(type)       \
+type type##_max(type x, type y) \
+{                               \
+    return x > y ? x : y;       \
+}
+```
+
+a) Show the preprocessor's expansion of `GENERIC_MAX(long)`
+
+b) Explain why `GENERIC_MAX` doesn't work for basic types such as `unsigned long`.
+
+c) Describe a technique that would allow us to use `GENERIC_MAX` with basic types such as `unsigned long`. Hint: Don't change the definition of `GENERIC_MAX`.
+
+```C
+/* a */     long long_max(long x, long y)
+            {
+                return x > y ? x : y;
+            }
+
+/* b */     "Because two words wouldn't expand properly"
+
+/* c */     "I'm pretty sure we can just supply "unsigned long" as a string?"
+```
+
+***
+
+### 8
+
+Suppose we want a macro that expands into a string containing the current line number and file name
+
+In other words, we'd like to write
+
+```C
+const char *str = LINE_FILE;
+```
+
+and have it expand into:
+
+```C
+const char *str = "Line 10 of file foo.c";
+```
+
+where `foo.c` is the file containing the program and `10` is the line on which the invocation of `LINE_FILE` appears.
+
+> *Warning: this exercise is for experts only! Be sure to read the Q&A section carefully before attempting!*
+
+```C
+#define STRINGIZE(x) #x
+#define STRINGIZE_EXP(x) STRINGIZE(x)
+#define LINE_FILE "Line " STRINGIZE_EXP(__LINE__) " of file " __FILE__
+```
+
+***
+
+### 9
+
+Write the following parameterized macros
+
+a) `CHECK(x,y,n)` - Has the value 1 if both x and y fall between 0 and n - 1. Inclusive.
+
+b) `MEDIAN(x,y,z)` - Finds the median of x, y, and z.
+
+c) `POLYNOMIAL(x)` - Computes the polynomial $3x^{5}+2x^{4}-5x^{3}-x^{2}+7x-6$
+
+```C
+#define CHECK( x, y, n )    ((x) >= 0 && (x) < n && (y) >= 0 && (y) < n)
+
+#define MEDIAN( x, y, z )   ((x)>(y) ?                                   \
+                            ((y)>(z) ? (y) :                             \
+                            ((x)>(z) ? (z) : (x))) :                     \
+                            ((x)>(z) ? (x) :                             \
+                            ((y)>(z) ? (z) : (y))))                      
+     
+#define POLYNOMIAL( x )     ( +3 * ((x) * (x) * (x) * (x) * (x))         \
+                              +2 * ((x) * (x) * (x) * (x))               \
+                              -5 * ((x) * (x) * (x))                     \
+                              -1 * ((x) * (x))                           \
+                              +7 * ((x))                                 \
+                              -6 )
+```
+
+***
+
+### 10
+
+Functions can often - but not always - be written as parameterised macros. Discuss what characteristics of a function would make it unsuitable as a macro
+
+I mean, these things are fucking insane. I wouldn't want to regularly work with C macros at this point. If I can write a function that will do the thing I need, I will write the function. This macro shit is never going to be the best approach.
+
+***
+
+### 11
+
+C programmers often use the `fprintf` function to write error messages
+
+```C
+fprintf(stderr, "Range error: index = %d\n", index);
+```
+
+`stderr` is C's standard error stream, the remaining arguments are the same as those for `printf`, starting with the format string. Write a macro named `ERROR` that generates the call of `fprintf` shown above when given a format string and the items to be displayed:
+
+```C
+ERROR("Range error: index = %d\n", index);
+```
+
+```C
+#define ERROR(f_str, idx)   fprintf(stderr, f_str, idx) 
+```
+
+***
+
+### 12
+
+Suppose that the macro `M` has been defined as follow: `#define M 10`. Which of the following tests will fail?
+
+a) `#if M`
+
+b) `#ifdef M`
+
+c) `#ifndef M`
+
+d) `#if defined(M)`
+
+e) `#if !defined(M)`
+
+a, b and d will fail.
+
+***
+
+### 13
+
+a) Show what the following program will look like after preprocessing. You may ignore any lines added to the program as a result of including the `<stdio.h>` header.
+
+```C
+#include <stdio.h>
+
+#define N 100
+
+void f(void);
+
+int main(void)
+{
+    f();
+#ifndef N
+#undef N
+#endif // !N
+    return 0;
+}
+
+void f(void)
+{
+#if defined(N)
+    printf("N is %d\n", N);
+#else
+    printf("N is undefined\n");
+#endif
+}
+```
+
+```C
+...  // lines from stdio.h
+
+void f(void);
+
+int main(void)
+{
+    f();
+    return 0;
+}
+
+void f(void)
+{
+    printf("N is %d\n", 100);
+}
+```
+
+b) What is the output of this program?
+
+```txt
+N is 100
+```
+
+***
+
+### 14
+
+Show what the following program will look like after preprocessing. Some lines of the program may cause compilation errors: find all such errors.
+
+```C
+#define N = 10
+#define INC(x) x+1
+#define SUB (x,y) x-y
+#define SQR(x) ((x)*(x))
+#define CUBE(x) (SQR(x)*(x))
+#define M1(x,y) x##y
+#define M2(x,y) #x #y
+
+int main(void)
+{
+    int a[N], i, j, k, m;
+
+#ifdef N
+    i = j;
+#else
+    j = i;
+#endif
+    i = 10 * INC(j);
+    i = SUB(j, k);
+    i = SQR(SQR(j));
+    i = CUBE(j);
+    i = M1(j, k);
+    puts(M2(i,j));
+
+#undef SQR
+    i = SQR(j);
+#define SQR
+    i = SQR(j);
+
+    return 0;
+}
+```
+
+```txt
+error: expected expression before '=' token
+ #define N = 10
+           ^
+error: 'x' undeclared (first use in this function)
+ #define SUB (x,y) x-y
+              ^
+error: 'y' undeclared (first use in this function)
+ #define SUB (x,y) x-y
+                ^
+error: expected ';' before 'x'
+ #define SUB (x,y) x-y
+                   ^
+error: 'jk' undeclared (first use in this function); did you mean 'k'?
+     i = M1(j, k);
+            ^
+```
+
+***
+
+### 15
+
+Suppose that a program needs to display messages in either English, French or Spanish. Using conditional compilation, write a program fragment that displays one of the following three messages, depending on whether or not the specified macro is defined.
+
+```txt
+Insert Disk 1        (if ENGLISH is defined)
+Inserez Le Disque 1  (if FRENCH is defined)
+Inserte El Disco 1   (if SPANISH is defined)
+```
+
+```C
+#ifdef ENGLISH
+    printf("Insert Disk 1");
+#elif defined(FRENCH)
+    printf("Inserez Le Disque 1");
+#else
+    printf("Inserte El Disco 1");
+```
+
+***
+
+### 16
+
+Assume that the following macro definitions are in effect:
+
+```C
+#define IDENT(x) PRAGMA(ident #x)
+#define PRAGMA(x) _Pragma(#x)
+```
+
+What will the following line look like after macro expansion?
+
+```C
+IDENT(foo)
+```
+
+```C
+PRAGMA(ident "foo")
+...
+_Pragma("ident \"foo\")
+...
+#pragma ident "foo"
+```
+
