@@ -23,15 +23,21 @@ int main(int argc, char *argv[])
     FILE *fp = open_file(filename);
 
     if (!fp) {
-        fprintf(stderr, "Error: could not open file %s\n", filename);
+        fprintf(stderr, "Error: could not open file %s!\n", filename);
+        fclose(fp);
         return EXIT_FAILURE;
     } 
-    else { 
-        print_file(fp);
-        printf("Total words: %d\n\n\n", count_words(fp));
-        WordList tally = generate_word_list(fp);
-        print_list(&tally);
+
+    print_file(fp);
+    printf("Total words: %d\n\n\n", count_words(fp));
+
+    WordList tally = generate_word_list(fp);
+    if (tally.unique_words < 1) {
+        fprintf(stderr, "Error: no unique words found in %s!\n", filename);
+        fclose(fp);
+        return EXIT_FAILURE;
     }
+    print_list(&tally);
 
     fclose(fp);
     return EXIT_SUCCESS;
@@ -96,44 +102,40 @@ WordList generate_word_list(FILE *file)
     while (!feof(file))
     {
         char c = (char) tolower(fgetc(file));
-        // copy (only) letters from the file into the word buffer
         if (isalpha(c)) {
             word[i++] = c;
         } 
-        // "if you hit a space or dash, add the buffer to the stash"
         if (c == ' ' || c == '\n' || c == '-') {
-            // if the word isn't the empty string, add it to the list ...thing
-            if (strcmp(word, "") != 0)
-            {
-                Word_t new_word = { .total_count = 1 };
-                strcpy(new_word.string, word);
-                add_to_list(&new_list, new_word);
+            if (strcmp(word, "") != 0) {
+                add_to_list(&new_list, word);
             }
-            // clear word buffer, reset index
             for (int j = 0; j < LONGEST_WORD; j++) { word[j] = 0; }
             i = 0;
         }
     }
-    sort_by_alpha(&new_list);
-    sort_by_count(&new_list);
     fseek(file, 0, SEEK_SET);
 
+    sort_by_alpha(&new_list);
+    sort_by_count(&new_list);
     return new_list;
 }
 
 /// @brief checks to see if a word is unique and adds it to the list or otherwise it increments its count
 /// @param list a WordList you want to add a Word to
 /// @param word the new Word_t you want to add to the list
-void add_to_list(WordList *list, Word_t word)
+void add_to_list(WordList *list, char *word)
 {
     if (list->unique_words >= MAX_WORDS)  {
         fprintf(stderr, "ERROR: MAX_WORDS reached in WordList (%d)", MAX_WORDS);
         return;
     }
 
-    int index = find_first(list, word);
+    Word_t new_word = { .total_count = 1 };
+    strcpy(new_word.string, word);
+
+    int index = find_first(list, new_word);
     if (index == -1) 
-        list->list[list->unique_words++] = word;
+        list->list[list->unique_words++] = new_word;
     else
         list->list[index].total_count++;
 }
