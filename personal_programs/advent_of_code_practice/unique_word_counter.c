@@ -1,45 +1,43 @@
-// FILE PRINTER
+// UNIQUE WORD COUNTER
 // andr-be 11/2023
 /* 
     Capable of generating a list of unique words when privded an ASCII text file
     that list is sorted in terms of count, and within equivalent counts is printed alphabetically
 */
 
-#include "read_from_file.h"
+#include "unique_word_counter.h"
 
 int main(int argc, char *argv[])
 {
     char filename[MAX_FILEPATH] = {0};
-    #ifdef DEBUG
-    filename = "test_file_small.txt";
-    #else 
     if (argc < 2) {
         fprintf(stderr, "Error: no filename provided!");
         return EXIT_FAILURE;
     }
     strcpy(filename, argv[1]);
-    #endif  // DEBUG
 
-    FILE *fp = open_file(filename);
-
-    if (!fp) {
+    // tries to open the targeted file and returns an error if it fails
+    FILE *file_ptr = open_file(filename);
+    if (!file_ptr) {
         fprintf(stderr, "Error: could not open file %s!\n", filename);
-        fclose(fp);
+        fclose(file_ptr);
         return EXIT_FAILURE;
     } 
 
-    print_file(fp);
-    printf("Total words: %d\n\n\n", count_words(fp));
+    // print the contents of the file with a line number prefix
+    print_file(file_ptr);
+    printf("\n\n\n");
 
-    WordList tally = generate_word_list(fp);
-    if (tally.unique_words < 1) {
+    // generate an organised and structured breakdown of the file
+    WordList list = generate_word_list(file_ptr);
+    if (list.unique_words < 1) {
         fprintf(stderr, "Error: no unique words found in %s!\n", filename);
-        fclose(fp);
+        fclose(file_ptr);
         return EXIT_FAILURE;
     }
-    print_list(&tally);
+    pretty_print(&list);
 
-    fclose(fp);
+    fclose(file_ptr);
     return EXIT_SUCCESS;
 }
 
@@ -70,29 +68,9 @@ void print_file(FILE *file)
     return;
 }
 
-/// @brief counts the number of individual words in a file
-/// @param file pointer to a file
-/// @return the number of individual words
-int count_words(FILE *file)
-{
-    int word_count = 0;
-    for (int line_number = 0; !feof(file); line_number++)
-    {
-        char *line = calloc(LINE_MAX, sizeof(char));
-        fgets(line, LINE_MAX, file);
-
-        for (char *fp = line; *fp; fp++)
-            if (*fp == ' ') word_count++;
-
-        free(line);
-    }
-    fseek(file, 0, SEEK_SET);
-    return word_count;
-}
-
-/// @brief creates a new word list from the provided .txt file
+/// @brief creates a a fully sorted and alphabetised list of unique words in provided .txt file
 /// @param file a file pointer to the .txt file
-/// @return a fully sorted and alphabetised list of unique words in the file
+/// @return a populated WordList struct
 WordList generate_word_list(FILE *file)
 {
     char word[LONGEST_WORD] = {0};
@@ -109,7 +87,9 @@ WordList generate_word_list(FILE *file)
             if (strcmp(word, "") != 0) {
                 add_to_list(&new_list, word);
             }
-            for (int j = 0; j < LONGEST_WORD; j++) { word[j] = 0; }
+            for (int j = 0; j < LONGEST_WORD; j++) { 
+                word[j] = 0; 
+            }
             i = 0;
         }
     }
@@ -121,7 +101,7 @@ WordList generate_word_list(FILE *file)
 }
 
 /// @brief checks to see if a word is unique and adds it to the list or otherwise it increments its count
-/// @param list a WordList you want to add a Word to
+/// @param list a WordList you want to add a word to
 /// @param word the new Word_t you want to add to the list
 void add_to_list(WordList *list, char *word)
 {
@@ -143,7 +123,7 @@ void add_to_list(WordList *list, char *word)
 /// @brief returns the index of the first match in the list, otherwise returns -1
 /// @param list the list to search in
 /// @param word the word to search for
-/// @return index of first match or -1 if no matches
+/// @return index of first match (-1 if no matches)
 int find_first(WordList *list, Word_t word)
 {
     // for every unique word
@@ -157,7 +137,7 @@ int find_first(WordList *list, Word_t word)
 }
 
 /// @brief bubble sort the list in alphabetical order
-/// @param list the list to be sorted
+/// @param list the WordList to be sorted
 void sort_by_alpha(WordList *list)
 {
     int swaps = 0;
@@ -165,11 +145,11 @@ void sort_by_alpha(WordList *list)
         swaps = 0;
         for (int i = 0; i < list->unique_words - 1; i++) 
         {
-            char *a = list->list[i].string, 
-                 *b = list->list[i + 1].string;
+            char *string_a = list->list[i].string, 
+                 *string_b = list->list[i + 1].string;
 
-            if (strcmp(a, b) > 0) {
-                swap_words(list, i, i+1);
+            if (strcmp(string_a, string_b) > 0) {
+                swap_words(list, i, i + 1);
                 swaps++;
             }
         }
@@ -177,15 +157,19 @@ void sort_by_alpha(WordList *list)
 }
 
 /// @brief bubble sort the list in descending count order
-/// @param list the list to be sorted
+/// @param list the WordList to be sorted
 void sort_by_count(WordList *list)
 {
     int swaps = 0;
     // BUBBLE SORT; FUCK IT
     do {
         swaps = 0;
-        for (int i = 0; i < list->unique_words - 1; i++) {
-            if (list->list[i].total_count < list->list[i + 1].total_count) {
+        for (int i = 0; i < list->unique_words - 1; i++) 
+        {
+            int count_a = list->list[i].total_count,
+                count_b = list->list[i + 1].total_count;
+
+            if (count_a < count_b) {
                 swap_words(list, i, i + 1);
                 swaps++;
             }
@@ -194,13 +178,15 @@ void sort_by_count(WordList *list)
 }
 
 /// @brief swaps two words in a list at the two given indexes (with bounds checking)
-/// @param list list to perform swap within
+/// @param list WordList to perform swap within
 /// @param idx_a index of the first word
 /// @param idx_b index of the second word
 void swap_words(WordList *list, int idx_a, int idx_b)
 {
-    if (idx_a < 0 || idx_b < 0 || idx_a > list->unique_words || idx_b > list->unique_words)
+    if (idx_a < 0 || idx_b < 0 || idx_a > list->unique_words || idx_b > list->unique_words) {
+        fprintf(stderr, "Error: index for list items out of bounds! (a:%d b:%d)", idx_a, idx_b);
         return;
+    }
 
     Word_t temp = list->list[idx_a];
     list->list[idx_a] = list->list[idx_b];
@@ -209,8 +195,17 @@ void swap_words(WordList *list, int idx_a, int idx_b)
 
 /// @brief print the supplied WordList in a pleasing format
 /// @param list the WordList to be printed
-void print_list(WordList *list) 
+void pretty_print(WordList *list) 
 {
-    for (int i = 0; i < list->unique_words; i++)
-        printf("%3d:\t%25s\t(%d)\n", i, list->list[i].string, list->list[i].total_count);
+    int total = 0;
+    for (int i = 0; i < list->unique_words; i++) {
+        printf(
+            "%3d:\t%25s\t(%d)\n", 
+            i, 
+            list->list[i].string, 
+            list->list[i].total_count
+        );
+        total += list->list[i].total_count;
+    }
+    printf("TOTAL WORDS: %d\n", total);
 }

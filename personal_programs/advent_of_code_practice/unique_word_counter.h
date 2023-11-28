@@ -22,12 +22,11 @@ typedef struct WordList {
 
 FILE *open_file(const char *filename);
 void print_file(FILE *file);
-int count_words(FILE *file);
 
 WordList generate_word_list(FILE *file);
+int find_first(WordList *list, Word_t word);
 void add_to_list(WordList *list, char *word);
-void print_list(WordList *list); 
+void pretty_print(WordList *list); 
 void sort_by_count(WordList *list);
 void sort_by_alpha(WordList *list);
 void swap_words(WordList *list, int idx_a, int idx_b);
-int find_first(WordList *list, Word_t word);
