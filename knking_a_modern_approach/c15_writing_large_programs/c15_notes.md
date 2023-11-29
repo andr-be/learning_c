@@ -139,3 +139,103 @@ The inherent problems meant that C99 probibits calling a function for which the 
 
 > When calling a function `f` that's defined in another file, always make sure that the compiler has seen a prototype for `f` prior to the call.
 
+Suppose that a function is called in fifty different source files. How can we ensure that `f`s prototypes are the same in all the files? How can we guarantee that they match the definition of `f` in `foo.c`? If `f` should change later, how can we find all the files where it's used?
+
+The solution? Put `f`'s prototypes in a header file, and then include the header file in all the places that `f` is called. Since `f` is defined in `foo.c`, we should call the header file `foo.h`. In addition to including `foo.h` in the source files where `f` is called, we'll also need to include it in `foo.c`.
+
+> Always includethe header file declaring a function `f` in the source file that contains `f`'s definition. Failure to do so can cause hard-to-find bugs, since calls of `f` elsewhere in the program may not match `f`'s definition.
+
+If `foo.c` contains other functions, most of them should be declared in the same header file as `f`. Functions that are intended for use only within `foo.c` shouldn't be declared in a header file as to do so would be misleading.
+
+For the RPN calculator we looked at in Section 15.1, the `stack.c` file will contain definitions of the `make_empty`, `is_empty`, `is_full`, `push` and `pop` functions. The following prototypes for these functions should go in the `stack.h` header file:
+
+```C
+// stack.h
+
+void make_empty(void);
+int is_empty(void);
+int is_full(void);
+void push(int i);
+int pop(void);
+```
+
+```C
+// calc.c
+
+#include "stack.h"
+int main(void)
+{
+    make_empty();
+    ...
+}
+```
+
+```C
+// stack.c
+
+#include "stack.h"
+
+int contents[100];
+int top = 0;
+
+void make_empty(void)
+{...}
+int is_empty(void)
+{...}
+int is_full(void)
+{...}
+void push(int i)
+{...}
+int pop(void)
+{...}
+```
+
+### Sharing Variable Declarations
+
+External variables can be shared among files in the same way functions are. TO share a function, we put its definition in one source file, then put declarations in other files that need to call the function, and sharing an external variable is done in much the same way.
+
+First, we need to distinguish between a variable's declaration and its definition. 
+
+```C
+int i;            // declares i and defines it as well
+
+extern int i;     // declares i without defining it
+
+extern int a[];   // declares array a without a specified length
+```
+
+In the first example, `i` is considered 'defined' because the compiler has set aside some space for it. To declare `i` without doing this, we need to use the `extern` keyword at the start of the declaration; `extern` informs the compiler that `i` is defined elsewhere in the program (most likely in a different source file), so there's no need to allocate space for it.
+
+`extern` works with variables of all types and when we use it in the declaration of an array, we can omit the length of the array because there's no need to know the array's length if you're not allocating it any memory.
+
+To share a variable `i` among several source files, we fist put a definition of `i` in one file. If `i` needs to be initialised, the initialiser will also go here. When the file is compiled, the compiler will allocate storage for `i`. The other files will contain declarations of `i`.
+
+By declaring `i` in each file, it becomes possible to access and/or modify `i` within those files and because we've used `extern`, the compiler doesn't allocate additional storage for `i` each time one of the files is compiled.
+
+When a variable is shared across files, we'll face a challenge ensuring that all declarations of the variable agree with the definition of the variable. For example, one file may contain the definition `int variable;` while another file contains the declaration `extern long variable;`, which can cause the program to behave very unpredictably. 
+
+Although sharing variables among files is a long-standing practice in C, it has significant disadvantages; we'll cover these in Section 19.2 and learn how to design programs that don't require shared variables.
+
+### Nested Includes
+
+A header file may also contain `#include` directives. Consider `stack.h` again:
+
+```C
+int is_empty(void);
+int is_full(void);
+```
+
+As these functions can only return 1 or 0, it's a good idea to declare their return type to be `bool` instead of `int`, by including `stdbool.h`:
+
+
+```C
+#include <stdbool.h>
+
+bool is_empty(void);
+bool is_full(void);
+```
+
+Traditionally, C programmers used to shun nested include statements (as early versions of C didn't support them) but with their relative popularity in C++ there is a gradual decline in this convention. 
+
+### Protecting Header Files
+

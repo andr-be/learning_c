@@ -8,7 +8,6 @@
 #define LINE_MAX 1024
 #define MAX_WORDS 10000
 #define LONGEST_WORD 50
-#define MAX_ITER 1024 * 10
 
 typedef struct Word_t {
     int total_count;
