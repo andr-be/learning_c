@@ -5,41 +5,7 @@
     that list is sorted in terms of count, and within equivalent counts is printed alphabetically
 */
 
-#include "unique_word_counter.h"
-
-int main(int argc, char *argv[])
-{
-    char filename[MAX_FILEPATH] = {0};
-    if (argc < 2) {
-        fprintf(stderr, "Error: no filename provided!");
-        return EXIT_FAILURE;
-    }
-    strcpy(filename, argv[1]);
-
-    // tries to open the targeted file and returns an error if it fails
-    FILE *file_ptr = open_file(filename);
-    if (!file_ptr) {
-        fprintf(stderr, "Error: could not open file %s!\n", filename);
-        fclose(file_ptr);
-        return EXIT_FAILURE;
-    } 
-
-    // print the contents of the file with a line number prefix
-    print_file(file_ptr);
-    printf("\n\n\n");
-
-    // generate an organised and structured breakdown of the file
-    WordList list = generate_word_list(file_ptr);
-    if (list.unique_words < 1) {
-        fprintf(stderr, "Error: no unique words found in %s!\n", filename);
-        fclose(file_ptr);
-        return EXIT_FAILURE;
-    }
-    pretty_print(&list);
-
-    fclose(file_ptr);
-    return EXIT_SUCCESS;
-}
+#include "file_io.h"
 
 /// @brief when given a filename, returns a file pointer
 /// @param filename name of file to open (with extension)
