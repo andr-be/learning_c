@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/c14_preprocessor/Programs",
-      "program": "c:/Users/Ben/Desktop/C/learning_c/knking_a_modern_approach/c14_preprocessor/Programs/build/Debug/outDebug",
+      "cwd": "c:/Users/Ben/Desktop/C/learning_c/personal_programs/AdventOfCode2023/day_03/src",
+      "program": "c:/Users/Ben/Desktop/C/learning_c/personal_programs/AdventOfCode2023/day_03/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

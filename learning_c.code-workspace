@@ -9,7 +9,9 @@
             "stdio.h": "c",
             "limits": "c",
             "type_traits": "c",
-            "string.h": "c"
+            "string.h": "c",
+            "stdlib.h": "c",
+            "ctype.h": "c"
         },
         "gitlens.currentLine.enabled": false,
         "gitlens.plusFeatures.enabled": false
