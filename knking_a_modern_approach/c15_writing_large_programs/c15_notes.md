@@ -270,3 +270,65 @@ When this file is included the first time, the BOOLEAN_H macro won't be defined,
 
 ## Dividing a Program into Files
 
+We'll now use what we know about header files and source files to develop a simple technique for dividing a program into files. Initially we'll concentrate on functions, but the same principles apply to external variables as well. We're going to be assuming the program has already been designed i.e. we've decided what functions we need and how to arrange them into groups.
+
+Each set of functions will go into a separate source file (e.g. `foo.c`). We'll also create a header file with the same name as the source file, but with a `.h` extension. Inside `foo.h` we'll place prototypes for all functions defined in `foo.c`. 
+
+NB: Functions that are designed for use only within `foo.c` need not and should not be declared in `foo.h`. We'll include `foo.h` in every source file that needs to call a function defined in `foo.c`. Also, we'll include `foo.h` in `foo.c` so the compiler can check that the function prototypes are consistent with their definitions. 
+
+The `main` function will go into its own file whose name matches the name of the program. If we wanted the program to be known as `bar`, main should be in the file `bar.c`. It's possible that there are other functions in the same file as `main`, so long as they're not called from other files in the program.
+
+### Text Formatting
+
+To illustrate the principles outlined above, let's apply it to a small text formatting program named `justify`. As input, we'll use a file named `quote` that contains the following (poorly formatted) quotation from a book by Dennis Ritchie:
+
+```quote.txt
+  C     is quirky,  flawed,   and  an 
+enormous   success.       Although accidents of    history
+surely  helped,   it evidently      satisfied   a   need
+    for  a   system   implementation   language     efficient
+enough   to displace                assembly    language,
+  yet sufficiently   abstract    and fluent   to describe
+ algorithms   and      interactions      in a    wide   variety
+of    environments.
+          --     Dennis     M.        Ritchie
+```
+
+To run the program from a UNIX or Windows prompt, we'd enter the command 
+
+```shell
+justify <quote
+```
+
+(The < unary symbol tells the OS to read input from the file quote and not the keyboard.) When iven the `quote` file as input, the `justify` program will produce the following output:
+
+```output
+C is quirky, flawed, and an enormous success. Although accidents of history
+surely helped, it evidently satisfied a need for a system implementation language 
+efficient enough to displace assembly language, yet sufficiently abstract and 
+fluent to describe algorithms and interactions in a wide variety of environments.
+  -- Dennis M. Ritchie
+```
+
+The output of `justify` will normally just appear on the screen, but we can save it in a file using *output redirection*. 
+
+```shell
+justify <quote >newquote
+```
+
+The output of `justify` will go to the file `newquote`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
