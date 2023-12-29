@@ -238,4 +238,35 @@ bool is_full(void);
 Traditionally, C programmers used to shun nested include statements (as early versions of C didn't support them) but with their relative popularity in C++ there is a gradual decline in this convention. 
 
 ### Protecting Header Files
+If a source file includesa the same header twice, compilation errors may result. This is common when header files include other header files. 
+Suppose that `file1.h` includes `file3.h`. `file2.h` also includes `file3.h` and `prog.c` includes both `file1.h` and `file2.h`. When `prog.c` is compiled, `file3.h` will be compiled twice.
+
+Including the same header file twice doesn't always cause a compilation error; if the file contains only macro definitions, function prototypes and/or variable declarations, there won't be any difficulty. If the file contains a type defintiion, that will throw an error.
+
+Just to be safe, it's a good idea to protect all header files against multiple inclusion; this might also save us some time by avoiding unnecessary recompilation of the same header file.
+
+```C
+#ifndef BOOLEAN_H
+#define BOOLEAN_H
+
+#define TRUE 1
+#define FALSE 0
+typedef int Bool;
+
+#endif
+```
+
+When this file is included the first time, the BOOLEAN_H macro won't be defined, so the preprocessor will allow the lines between `#ifndef` and `#endif`. The name of the macro doesn't matter, but making it resemble the name of the header file is good practice.
+
+### `#error`Directives in Header Files
+
+`#error` directives are often put in header files to check for conditions under which the header shouldn't be included e.g. it uses features that didn't exist prior to C89. To prevent this header being used with older, nonstandard compilers, we could write:
+
+```C
+#ifndef __STDC__
+#error This header requires a Standard C compiler!
+#endif
+```
+
+## Dividing a Program into Files
 
