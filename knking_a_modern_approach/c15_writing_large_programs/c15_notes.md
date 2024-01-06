@@ -316,19 +316,479 @@ The output of `justify` will normally just appear on the screen, but we can save
 justify <quote >newquote
 ```
 
-The output of `justify` will go to the file `newquote`.
+The output of `justify` will go to the file `newquote`. 
 
+In general, `justify`'s output should be identical to its input, except that extra spaces and blank lines are deleted and the lines are filled and justified. "Filling" a line just means adding words until one more word would cause the line to overflow. "Justifying" a line means adding extra spaces between words so that each line has exactly the same length (60 characters). Justification mustbe done so that the space between words in a line is as equal as possible. The last line of the output won't be justified. 
 
+We'll assume that no word is longer than 20 characters, and that a punctuation mark counts as part of the word to which it is adjacent. If the program encounters a longer word, it must ifnore all charactes after thew first 20, replacing them with a single asterisk. e.g:
 
+```
+antidisestablishmentarianism
+```
 
+would become
 
+```
+antidisestablishment*
+```
 
+With that in mind, it's time to start thinking about the design of the program. We'll start by observing that the program can't write the words one by one as they're read, it will instead have to store them in a line buffer until there are enough to fill a line. 
 
+```C
+for (;;) 
+{
+    read word;
+    if (can't read word) 
+    {
+        write contents of line buffer without justification;
+        terminate program;
+    }
+    if (word doesn't fit in line buffer)
+    {
+        write contents of line buffer with justification;
+        clear line buffer;
+    }
+    add word to line buffer;
+    }
+```
 
+Since we'll need functions that deal with words and functions that deal with the line buffer, we should split the program into three source files, putting all functions related to words in one file (word.c) and all functions related to the line buffer in another file (line.c). A third file (justify.c) will contain the `main` functions.
 
+In addition to these files, we'll need two header files, word.h and line.g. The word.h file will contain prortypes for the functions in word.c: line.h will play a similar role for line.c.
 
+By examining the main loop, we see that the only word-related function that we'll need is a `read_word` function. If `read_word` can't read a word because it's reached the end of the input file, we'll have it signal the main loop by pretending to read an "empty" word. Consequently, `word.h` is a small file.
 
+```C
+// word.h
+#ifndef WORD_H
+#define WORD_H
 
+// read_word
+// reads the next word from the input and stores it in word.
+// makes word empty if no word could be read because of end-of-file
+// truncates the word if its length exceeds len.
 
+void read_word(char *word, int len);
+
+#endif
+```
+
+Notice how the `WORD_H` macro protects `word.h` from being included more than once. Although `word.h` doesn't really need it, it's good practice to protect all header files like this.
+
+The `line.h` file will be longer than `word.h`. Our outline of the main loop reveals the need for functions that perform the following operations. 
+
+- write contents of line buffer without justification
+- determine how many characters are left in line buffer
+- write contents of line buffer with justification
+- clear line buffer
+- add word to line buffer
+
+We'll call these functions `flush_line`, `space_remaining`, `write_line`, `clear_line`, and `add_word`. Here's what the `line.h` header file will look like:
+
+```C
+// line.h
+#ifndef LINE_H
+#define LINE_H
+
+// clear line
+// clears the current line
+void clear_line(void);
+
+// add_word
+// adds word to the end of the current line. 
+// if this is not the first word on the line, puts one space before word.
+void add_word(const char *word); 
+
+// space_remaining
+// returns the current number of characters left in the current line
+int space_remaining(void);
+
+// write_line
+// writes the current line with justification
+void write_line(void);
+
+// flush_line
+// writes the current line without justification; does nothing if line is empty
+void flush_line(void);
+
+#endif
+```
+
+Before we write the `word.c` and `line.c` files, we can use the functions declared in `word.h` and `line.h` to write `justify.c`, the main program. Writing this file is mostly a matter of translating our original loop design into C.
+
+```C
+// justify.c
+/*
+    formats a file of text
+*/
+
+#include <string.h>
+#include "line.h"
+#include "word.h"
+
+#define MAX_WORD_LEN 20
+
+int main(void)
+{
+    char word[MAX_WORD_LEN + 1];
+    int word_len;
+
+    clear_line();
+
+    for (;;)
+    {
+        read_word(word, MAX_WORD_LEN + 1);
+        word_len = strlen(word);
+        
+        if (word_len == 0)
+        {
+            flush_line();
+            return 0;
+        }
+        
+        if (word_len > MAX_WORD_LEN)
+        {
+            word[MAX_WORD_LEN] = '*';
+        }
+        
+        if (word_len + 1 > space_remaining())
+        {
+            write_line();
+            clear_line();
+        }
+        
+        add_word(word);
+    }
+}
+```
+
+Including both `line.h` and `word.h` gives the compiler access to the function prototypes in both files as it compiles `justify.c`.
+
+`main` uses a trick to handle words that exceed 20 characters. When it calls `read_word`, `main` telsl it to truncate any word that exeeds 21 characters. After `read_word` returns, `main` checks whether word contains a string that's longer than 20 characters. If so, the word that was read must have been at least 21 characters long, so main replaces the word's 21st character with an asterisk.
+
+Now it's time to write `word.c`. Although the `word.h` header file has a prototype for only one function; `read_word`, this gives us space to put additional functions into `word.c` if we need to. As it turns out, `read_word` is much easier to write if we add a small "helper" function, `read_char`, which we'll assign the task of reading a single character and if its a newline or tab, converting it into a space. Having `read_word` will call `read_char` instead of `getchar` solves the problem of treating new_line characters and tabs as spaces.
+
+```C
+// word.c
+
+#include <stdio.h>
+#include "word.h"
+
+int read_char(void)
+{
+    int ch = getchar();
+
+    if (ch == '\n' || ch == '\t')
+    {
+        return ' ';
+    }
+
+    return ch;
+}
+
+void read_word(char *word, in len)
+{
+    int ch, pos = 0;
+
+    while ((ch = read_char()) == ' ')
+        ;
+
+    while (ch != ' ' && ch != EOF)
+    {
+        if (pos < len)
+        {
+            word[pos++] = ch;
+        }
+
+        ch = read_char();
+    }
+    word[pos] = '\0';
+}
+```
+
+A couple of comments are in order regarding the use of `getchar` in the `read_char` function. First, `getchar` returns an `int` value instead of a `char` value: that's why the variable `ch` in `read_char` is declared to have type `int` and why the return value of `read_char` is `int`. Also `getchar` returns the value EOF when its unable to continue reading (usually because it has reached the end of the input file).
+
+`read_word` consists of two loops. The first loop skips over spaces, stopping at the first nonblank character. (EOF isn't a blank, so the loop stops if it reaches the end of the input file.) The second loop lreads characters until encountering a space or EOF. The body of the loop stores the cahracters in `word` until reaching the `len` limit. After that, the loop continues reading characters but doesn't store them. The final statement in `read_word` ends the word with a null character, thereby making it a string. If `read_word` encounters `EOF` before finding a nonblank character, `pos` will be 0 at the end, making `word` an empty line.
+
+The only file left to create is `line.c` which supplies definitions of the functions declared in the `line.h` file. `line.c` will also need variables to keep track of the state of the line buffer. One vatriable, `line`, will store the characters in the current line. Strictly speaking `line` is the only variable we need. For speed and convenience, we'll also use `line_len` and `num_word`.
+
+```C
+// line.c
+
+#include <stdio.h>
+#include <string.h>
+#include "line.h"
+
+#define MAX_LINE_LEN 60
+
+char line[MAX_LINE_LEN + 1];
+int line_len = 0;
+int num_words = 0;
+
+void clear_line(void)
+{
+    line[0] = '\0';
+    line_len = 0;
+    num_words = 0;
+}
+
+void add_word(const char *word)
+{
+    if (num_words > 0)
+    {
+        line[line_len] = ' ';
+        line[line_len + 1] = '\0';
+        line_len++;
+    }
+    strcat(line, word);
+    line_len += strlen(word);
+    num_words++;
+}
+
+int space_remaining(void)
+{
+    return MAX_LINE_LEN - line_len;
+}
+
+void write_line(void)
+{
+    int extra_spaces, spaces_to_insert, i, j;
+
+    extra_spaces = MAX_LINE_LEN - line_len;
+    for (i = 0; i < line_len; i++)
+    {
+        if (line[i] != ' ')
+        {
+            putchar(line[i]);
+        }
+        else 
+        {
+            spaces_to_insert = extra_spaces / (num_words - 1);
+            for (j = 1; j <= spaces_to_insert + 1; j++)
+            {
+                putchar(' ');
+            }
+            extra_spaces -= spaces_to_insert;
+            num_words--;
+        }
+    }
+    putchar('\n');
+}
+
+void flush_line(void)
+{
+    if (line_len > 0)
+    {
+        puts(line);
+    }
+}
+```
+
+Most of the functions in `line.c` are easy to write. The only tricky one is `write_line`, which writes a line with justification. `write_line` writes the characters in `line` one by one, pausing at the space between each pair of words to write additional spaces if needed. 
+
+The number of additional spaces is stored in `spaces_to_insert`, which has the value `extra_spaces / (num_words - 1)`, where `extra_spaces` is initially the difference between the maximum line length and the actual line length. 
+
+Since `extra_spaces` and `num_words` change after each word is printed, `spaces_to_insert` will change as well. If `extra_spaces` is 10 initially and `num_words` is 5, then the first word will be followed by 2 extra spaces, the second by 2, the third by 3 and the fourth by 3. 
+
+## 15.4 Building a Multiple-File Program
+
+Building a large program requires the same basic steps as building a small one:
+
+- Compiling. Each source file in the program must be compiled separately. Header files don't need to be compiled as they do so automatically whenever they're included.
+
+- Linking. The linker combines the object files created in the previous step along with code for library functions to produce an executable file. Among other duties, the linker is responsible for resolving external references left behind by the compiler.
+
+Most compilers all us to build a program in a single step; with GCC we'd use the following command to build `justify`:
+
+```shell
+gcc -o justify justify.c line.c word.c
+```
+
+The three source files are first compiled into object code, and then the object files are passed to the linker to be combined into a single file. `-o` specifies that we want the executable file's name to be `justify`. 
+
+### Makefiles
+
+Putting the names of all relevant source files on the command line quickly gets tedious. We can also waste a lot of time rebuilding a program if we recompile all source files, not just the ones that were changed.
+
+To make it easier to build large programs, UNIX created the concept of the makefile, a file containing the information necessary to build a program. 
+
+Makefiles list the files that are part of the program, but also describe dependencies among the files. Suppose that `foo.c` includes the file `bar.h`, we say that `foo.c` "depends" on `bar.h`, because a change to it will require us to recompile `foo.c`. 
+
+Here's a UNIX makefile for the `justify` program:
+
+```Makefile
+justify:  justify.o word.o line.o 
+    gcc -o justify justify.o word.o line.o
+
+justify.o: justify.c word.h line.h
+    gcc -c justify.c
+
+word.o: word.c word.h
+    gcc -c word.c
+
+line.o: line.c line.h
+    gcc -c line.c
+```
+
+There are four groups of lines, each group is known as a rule. The first line in each rule gives a ***target*** file, followed by the file on which it depends. 
+
+The second line is a command to be executed if the target should need to be rebuilt because of a change to its dependent files. 
+
+In the second rule, `justify.o` is the target:
+
+```Makefile
+justify.o: justify.c word.h line.h
+    gcc -c justify.c
+```
+
+Once we've created a makefile for a program, we can use the `make` utility to build (or rebuild) the program. By checking the time and date associated with each file in the program, `make` can determine which files are out of date.
+
+- Each command in a makefile must be preceded by a tab character and not a series of spaces.
+
+- a makefile is normally stored in a file named `Makefile` or `makefile`. When the make utility is used, it automatically checks the current directory for a file with one of these names.
+
+- To invoke `make`, use the command `make target` where target is one of the targets listed in the makefile. 
+
+- If no target is specified when make is invoked, it will build the target of the first rule. Except for this special property of the first rule, the order of rules in a makefile is arbitrary.
+
+Make is complicated enough that entire books have been written about it, so we won't attempt to delve deeper in this book.
+
+### Errors During Linking
+
+Some errors that can't be detected during compilation will be found during linking. These errors are usually quite easy to fix:
+
+- Misspellings. If the name of a variable or function is misspelled, the linker will report it as missing. e.g. if we've misspelled `read_char` as `read_cahr` the linker will report that `read_cahr` is missing.
+
+- Missing Files. If the linker can't find the functions that are in `foo.c`, it may not know about the file. Check the makefile or project file to make sure that `foo.c` is listed there.
+
+- Missing Libraries. The linker may not be able to find all the library functions used in the program. Some libraries, such as `<math.h` require you to use the flag `-lm` option when the program is linked to work correctly.
+
+### Rebuilding a Program
+
+During the development of a program, it's rare that we'll need to compile all of its files at the same time. Typically, we'll test the program, make a change and then build it again. To save time, the rebuilding process should recompile only those files that might have changed.
+
+***The first possibility*** is that the change affects a single source file. In that case, only that file must be recompiled, and the entire program will need to be relinked. In the `justify` program, suppose we decide to condense the `read_char` function in `word.c`.
+
+```C
+int read_char(void)
+{
+    int ch = getchar();
+
+    return (ch == '\n' || ch == '\t') ? ' ' : ch;
+}
+```
+
+This modification doesn't affect `word.h`, so we need only recompile `word.c` and relink the program. 
+
+***The second possibility*** is that the change affects a header file. In that case, we should recompile all files that include the header file, since they could potentially be affected by the change.
+
+In the event that we want to change the `read_word` function to cut out the requirement for calling `strlen` on it (as it already tracks the length of the string). 
+
+First, we change the prototype of `read_word` in `word.h`:
+
+```C
+// read_word:
+/*
+ *  Reads the next word from the input and stores it in word
+ *  Makes word empty if no word can be read due to EOF
+ *  Truncates the word if its length exceeds len
+ *  Returns the number of characters stored.
+ */
+int read_word(char *word, int len);
+```
+
+We also need to change it `word.c`. 
+
+```C
+int read_word(char *word, int len)
+{
+    int ch, pos = 0;
+
+    while ((ch = read_char()) == ' ')
+        ;
+    while (ch != ' ' && ch != EOF)
+    {
+        if (pos < len)
+        {
+            word[pos++] = ch;
+        }
+        ch = read_char();
+    }
+    word[pos] = '\0';
+    return pos;
+}
+```
+
+Finally we modify `justify.c` by removing the include of `<string.h>` and changing `main` as follows:
+
+```C
+int main(void)
+{
+    char word[MAX_WORD_LEN+2];
+    int word_len;
+
+    clear_line();
+
+    for (;;)
+    {
+        word_len = read_word(word, MAX_WORD_LEN + 1);
+        if (word_len == 0)
+        {
+            flush_line();
+            return 0;
+        }
+        if (word_len + 1 > space_remaining())
+        {
+            write_line();
+            clear_line();
+        }
+        add_word(word);
+    }
+}
+```
+
+Once we've made these changes, we'll rebuild the `justify` program by recompiling `word.c` and `justify.c` and then relinking. There's no need to recompile `line.c`, which doesn't include`word.h` and won't be affected by any changes to it. 
+
+With GCC, we could rebuild it by entering the following command; note the mention of `line.o` instead of `line.c`:
+
+```bash
+gcc -o justify justify.c word.c line.o
+```
+
+One of the main advantages of using makefiles is that rebuilding is handled automatically. By examining the date of each file, the `make` utility can determined which files have changed since the program was last built. It then recompiles these files and all files that depend on them.
+
+### Defining Macros Outside a Program
+
+C Compilers usually provide some method of specifying the value of a macro at the time a program is compiled. This ability makes it easy to change the value of a macro without editing any of the program's files. 
+
+GCC supports the `-D` option, which allows the value of a macro to be specified on the command line:
+
+```bash
+gcc -DDEBUG=1 foo.c
+```
+
+is equivalent to putting the line 
+
+```C
+#define DEBUG 1
+```
+
+At the beginning of `foo.c`. If the `-D` flag names a macro without specifying its value, it's defined as having a value of 1. 
+
+Many compilers also support the `-U` option, which "undefines" a macro as if you'd just used `#undef` in the source file. We can use `-U` to undefine a predefined macro or one that was defined earlier in the command line using `-D`. 
+
+## Chapter 15 Q&A
+
+Q: There are no examples of using the `#include` directive to include a source file; what would happen if we were to do this?
+
+A: It's not good practice. Suppose that we have a function that we'll need in two files, so in both of those files we put `#include foo.c` into both of their files. Each will compile without issue.
+
+However, the linker will later throw an error when it finds two different copies of the function we wanted in the two different files, and throws an error.
+
+Q: I don't understand why each source file needs its own header file; why not just have one big header file containing macros, `typedef`s and function prototypes? By including this file, each source file would have access to all the shared information it needs.
+
+A: The "one big header file" approach certainly works, and finds use in C programming all over the place. However, for larger programs, the disadvantages of this approach tend to outweigh its advantages.
+
+Using a single header provides no useful information to someone reading the program later. With multiple header files, the reader can quickly see that other parts of the program are used by a particular source file.
 
 
